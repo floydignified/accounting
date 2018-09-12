@@ -22,7 +22,10 @@
                 <a class="nav-link" href="#"><i class="fa fa- user"></i>User Profile</a>
                 <a class="nav-link" data-toggle="modal" data-target="#staticModal"><i class="fa fa- user"></i>Feedback</a>
                 <a class="nav-link" href="https://security.intuit.com/index.php/privacy"><i class="fa fa- user"></i>Privacy</a>
-                <a class="nav-link" href="#"><i class="fa fa-power-off"></i>Sign Out</a>
+                <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i>Sign Out</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    {{ csrf_field() }}
+                </form>
             </div>
             <div class="modal fade float-right" id="staticModal" tabindex="-1" role="dialog" aria-labelledby="staticModalLabel" aria-hidden="true" data-backdrop="false">
                 <div class="modal-dialog modal-sm float-right w-100" style="margin-top: 75px;" role="document">

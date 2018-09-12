@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
+use App\User;
+use App\Company;
+use App\Sales;
+use App\Expenses;
 
 class PagesController extends Controller
 {
@@ -71,7 +76,10 @@ class PagesController extends Controller
     }
     //  
     public function accountsandsettings(){
-        return view('pages.accountsandsettings');
+        $company = Company::first();
+        $sales = Sales::first();
+        $expenses = Expenses::first();
+        return view('pages.accountsandsettings', compact('company', 'sales', 'expenses'));
     }
     public function customformstyles(){
         return view('pages.customformstyles');
