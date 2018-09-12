@@ -216,6 +216,131 @@ jQuery(document).ready(function($) {
 		}
 
 	});
+
+	$('#toggle_edit_accounting').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#first_month_of_fiscal_year").prop('disabled')){
+			$("#first_month_of_fiscal_year").prop('disabled', false);
+			$("#first_month_of_tax_year").prop('disabled', false);
+			$("#accounting_method").prop('disabled', false);
+			$("#close_book").prop('disabled', false);
+		}else{
+			$("#first_month_of_fiscal_year").prop('disabled', true);
+			$("#first_month_of_tax_year").prop('disabled', true);
+			$("#accounting_method").prop('disabled', true);
+			$("#close_book").prop('disabled', true);
+		}
+
+	});
+
+	$('#toggle_edit_advance_company_type').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#advance_tax_form").prop('readonly')){
+			$("#advance_tax_form").prop('readonly', false);
+		}else{
+			$("#advance_tax_form").prop('readonly', true);
+		}
+
+	});
+
+	$('#toggle_edit_chart_of_accounts').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#enable_acc_number").prop('disabled')){
+			$("#enable_acc_number").prop('disabled', false);
+		}else{
+			$("#enable_acc_number").prop('disabled', true);
+		}
+
+	});
+
+	$('#toggle_edit_categories').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#track_classes").prop('disabled')){
+			$("#track_classes").prop('disabled', false);
+			$("#track_location").prop('disabled', false);
+		}else{
+			$("#track_classes").prop('disabled', true);
+			$("#track_location").prop('disabled', true);
+		}
+
+	});
+
+	$('#toggle_edit_automation').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#prefill_form").prop('disabled')){
+			$("#prefill_form").prop('disabled', false);
+			$("#apply_credit").prop('disabled', false);
+			$("#invoice_unbilled_activity").prop('disabled', false);
+			$("#apply_bill_payment").prop('disabled', false);
+		}else{
+			$("#prefill_form").prop('disabled', true);
+			$("#apply_credit").prop('disabled', true);
+			$("#invoice_unbilled_activity").prop('disabled', true);
+			$("#apply_bill_payment").prop('disabled', true);
+		}
+
+	});
+
+	$('#toggle_edit_time_tracking').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#add_service_field").prop('disabled')){
+			$("#add_service_field").prop('disabled', false);
+			$("#single_time_activity_billable").prop('disabled', false);
+		}else{
+			$("#add_service_field").prop('disabled', true);
+			$("#single_time_activity_billable").prop('disabled', true);
+		}
+
+	});
+	
+	$('#toggle_edit_language').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#language").prop('disabled')){
+			$("#language").prop('disabled', false);
+		}else{
+			$("#language").prop('disabled', true);
+		}
+
+	});
+
+	$('#toggle_edit_currency').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#home_currency").prop('disabled')){
+			$("#home_currency").prop('disabled', false);
+			$("#multi_currency").prop('disabled', false);
+		}else{
+			$("#home_currency").prop('disabled', true);
+			$("#multi_currency").prop('disabled', true);
+		}
+
+	});
+
+	$('#toggle_edit_other_preferences').on('click', function(event) {
+		event.preventDefault();
+		
+		if($("#date_format").prop('disabled')){
+			$("#date_format").prop('disabled', false);
+			$("#number_format").prop('disabled', false);
+			$("#dup_cheque_num").prop('disabled', false);
+			$("#dup_bill_num").prop('disabled', false);
+			$("#inactive_time").prop('disabled', false);
+		}else{
+			$("#date_format").prop('disabled', true);
+			$("#number_format").prop('disabled', true);
+			$("#dup_cheque_num").prop('disabled', true);
+			$("#dup_bill_num").prop('disabled', true);
+			$("#inactive_time").prop('disabled', true);
+		}
+
+	});
 	
 
 });

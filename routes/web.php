@@ -19,6 +19,7 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/update_company', 'CompanyController@update_company')->name('update_company');
     Route::post('/update_sales', 'CompanyController@update_sales')->name('update_sales');
     Route::post('/update_expenses', 'CompanyController@update_expenses')->name('update_expenses');
+    Route::post('/update_advance', 'CompanyController@update_advance')->name('update_advance');
 
     Route::get('/reports', 'PagesController@reports');
 

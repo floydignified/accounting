@@ -17,7 +17,7 @@ class SettingsAdvance extends Migration
             $table->integer('id')->unsigned();
             $table->primary('id');
             $table->integer('setting_id')->default('1');
-            $table->string('advance_first_month_of_financial_year');
+            $table->string('advance_first_month_of_fiscal_year');
             $table->string('advance_first_month_of_tax_year');
             $table->string('advance_accounting_method');
             $table->string('advance_close_book');

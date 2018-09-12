@@ -413,24 +413,58 @@
         </div>
         <!--=============================================================================================FIFTH TAB-->
         <div class="tab-pane fade show" id="advance" role="tabpanel" aria-labelledby="advance-tab">
+        <form action="#" class="form-horizontal " id="advance_form">
+        {{ csrf_field() }}
             <div class="col-md-12 mt-3">
                 <div class="col-md-3">
                     <p class="text-dark">Accounting</p>
                 </div>
                 <div class="col-md-4">
-                    <p class="text-dark">First month of financial year</p>
+                    <p class="text-dark">First month of fiscal year</p>
                     <p class="text-dark">First month of tax year</p>
                     <p class="text-dark">Accounting method</p>
                     <p class="text-dark">Close the books</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">January</p>
-                    <p class="text-dark font-weight-bold">Same as financial year</p>
-                    <p class="text-dark font-weight-bold">Accrual</p>
-                    <p class="text-dark font-weight-bold">Off</p>
+                    <select class="text-dark font-weight-bold" id="first_month_of_fiscal_year" name="first_month_of_fiscal_year" disabled>
+                        <option value="January" {{$advance->advance_first_month_of_fiscal_year == "January" ? 'selected' : ''}}>January</option>
+                        <option value="February" {{$advance->advance_first_month_of_fiscal_year == "February" ? 'selected' : ''}}>February</option>
+                        <option value="March" {{$advance->advance_first_month_of_fiscal_year == "March" ? 'selected' : ''}}>March</option>
+                        <option value="April" {{$advance->advance_first_month_of_fiscal_year == "April" ? 'selected' : ''}}>April</option>
+                        <option value="May" {{$advance->advance_first_month_of_fiscal_year == "May" ? 'selected' : ''}}>May</option>
+                        <option value="June" {{$advance->advance_first_month_of_fiscal_year == "June" ? 'selected' : ''}}>June</option>
+                        <option value="July" {{$advance->advance_first_month_of_fiscal_year == "July" ? 'selected' : ''}}>July</option>
+                        <option value="August" {{$advance->advance_first_month_of_fiscal_year == "August" ? 'selected' : ''}}>August</option>
+                        <option value="September" {{$advance->advance_first_month_of_fiscal_year == "September" ? 'selected' : ''}}>September</option>
+                        <option value="October" {{$advance->advance_first_month_of_fiscal_year == "October" ? 'selected' : ''}}>October</option>
+                        <option value="November" {{$advance->advance_first_month_of_fiscal_year == "November" ? 'selected' : ''}}>November</option>
+                        <option value="December" {{$advance->advance_first_month_of_fiscal_year == "December" ? 'selected' : ''}}>December</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="first_month_of_tax_year" name="first_month_of_tax_year" disabled>
+                        <option value="January" {{$advance->advance_first_month_of_tax_year == "January" ? 'selected' : ''}}>January</option>
+                        <option value="February" {{$advance->advance_first_month_of_tax_year == "February" ? 'selected' : ''}}>February</option>
+                        <option value="March" {{$advance->advance_first_month_of_tax_year == "March" ? 'selected' : ''}}>March</option>
+                        <option value="April" {{$advance->advance_first_month_of_tax_year == "April" ? 'selected' : ''}}>April</option>
+                        <option value="May" {{$advance->advance_first_month_of_tax_year == "May" ? 'selected' : ''}}>May</option>
+                        <option value="June" {{$advance->advance_first_month_of_tax_year == "June" ? 'selected' : ''}}>June</option>
+                        <option value="July" {{$advance->advance_first_month_of_tax_year == "July" ? 'selected' : ''}}>July</option>
+                        <option value="August" {{$advance->advance_first_month_of_tax_year == "August" ? 'selected' : ''}}>August</option>
+                        <option value="September" {{$advance->advance_first_month_of_tax_year == "September" ? 'selected' : ''}}>September</option>
+                        <option value="October" {{$advance->advance_first_month_of_tax_year == "October" ? 'selected' : ''}}>October</option>
+                        <option value="November" {{$advance->advance_first_month_of_tax_year == "November" ? 'selected' : ''}}>November</option>
+                        <option value="December" {{$advance->advance_first_month_of_tax_year == "December" ? 'selected' : ''}}>December</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="accounting_method" name="accounting_method" disabled>
+                        <option value="Accrual" {{$advance->advance_accounting_method == "Accrual" ? 'selected' : ''}}>Accrual</option>
+                        <option value="Cash" {{$advance->advance_accounting_method == "Cash" ? 'selected' : ''}}>Cash</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="close_book" name="close_book" disabled>
+                        <option value="On" {{$expenses->advance_close_book == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_close_book == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_accounting" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3  border border-bottom border-light"></div>
@@ -442,10 +476,10 @@
                     <p class="text-dark">Tax form</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">Sole Proprietor</p>
+                    <input list="tax_forms_list" class="text-dark" id="advance_tax_form" name="advance_tax_form" type="text" value="{{$advance->advance_tax_form}}" readonly>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_advance_company_type" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3  border border-bottom border-light"></div>
@@ -457,10 +491,13 @@
                     <p class="text-dark">Enable account numbers</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">Off</p>
+                    <select class="text-dark font-weight-bold" id="enable_acc_number" name="enable_acc_number" disabled>
+                        <option value="On" {{$expenses->advance_enable_acc_number == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_enable_acc_number == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_chart_of_accounts" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
@@ -473,11 +510,17 @@
                     <p class="text-dark">Track Locations</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">Off</p>
-                    <p class="text-dark font-weight-bold">Off</p>
+                    <select class="text-dark font-weight-bold" id="track_classes" name="track_classes" disabled>
+                        <option value="On" {{$expenses->advance_track_classes == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_track_classes == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="track_location" name="track_location" disabled>
+                        <option value="On" {{$expenses->advance_track_location == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_track_location == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_categories" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
@@ -492,13 +535,25 @@
                     <p class="text-dark">Automatically apply bill payments</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">On</p>
-                    <p class="text-dark font-weight-bold">On</p>
-                    <p class="text-dark font-weight-bold">Off</p>
-                    <p class="text-dark font-weight-bold">On</p>
+                    <select class="text-dark font-weight-bold" id="prefill_form" name="prefill_form" disabled>
+                        <option value="On" {{$expenses->advance_prefill_form == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_prefill_form == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="apply_credit" name="apply_credit" disabled>
+                        <option value="On" {{$expenses->advance_apply_credit == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_apply_credit == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="invoice_unbilled_activity" name="invoice_unbilled_activity" disabled>
+                        <option value="On" {{$expenses->advance_invoice_unbilled_activity == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_invoice_unbilled_activity == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="apply_bill_payment" name="apply_bill_payment" disabled>
+                        <option value="On" {{$expenses->advance_apply_bill_payment == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_apply_bill_payment == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_automation" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
@@ -511,11 +566,17 @@
                     <p class="text-dark">Make Single-Time Activity Billable to Customer</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">Off</p>
-                    <p class="text-dark font-weight-bold">On</p>
+                    <select class="text-dark font-weight-bold" id="add_service_field" name="add_service_field" disabled>
+                        <option value="On" {{$expenses->advance_add_service_field == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_add_service_field == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="single_time_activity_billable" name="single_time_activity_billable" disabled>
+                        <option value="On" {{$expenses->advance_single_time_activity_billable == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_single_time_activity_billable == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_time_tracking" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
@@ -527,10 +588,12 @@
                     <p class="text-dark">Language</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">English</p>
+                    <select class="text-dark font-weight-bold" id="language" name="language" disabled>
+                        <option value="English" {{$expenses->advance_language == "English" ? 'selected' : ''}}>English</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_language" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
@@ -543,11 +606,16 @@
                     <p class="text-dark">Multicurrency</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">Philippine Peso</p>
-                    <p class="text-dark font-weight-bold">Off</p>
+                    <select class="text-dark font-weight-bold" id="home_currency" name="home_currency" disabled>
+                        <option value="Philippine Peso" {{$expenses->advance_home_currency == "Philippine Peso" ? 'selected' : ''}}>Philippine Peso</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="multi_currency" name="multi_currency" disabled>
+                        <option value="On" {{$expenses->advance_multi_currency == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_multi_currency == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_currency" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
@@ -563,20 +631,35 @@
                     <p class="text-dark">Sign me out if inactive for</p>
                 </div>
                 <div class="col-md-4 font-weight-bold">
-                    <p class="text-dark font-weight-bold">MM/dd/yyyy</p>
-                    <p class="text-dark font-weight-bold">123.456.00</p>
-                    <p class="text-dark font-weight-bold">On</p>
-                    <p class="text-dark font-weight-bold">Off</p>
-                    <p class="text-dark font-weight-bold">3 hours</p>
+                    <select class="text-dark font-weight-bold" id="date_format" name="date_format" disabled>
+                        <option value="MM/dd/yyyy" {{$expenses->advance_date_format == "MM/dd/yyyy" ? 'selected' : ''}}>MM/dd/yyyy</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="number_format" name="number_format" disabled>
+                        <option value="123,456.00" {{$expenses->advance_number_format == "123,456.00" ? 'selected' : ''}}>123,456.00</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="dup_cheque_num" name="dup_cheque_num" disabled>
+                        <option value="On" {{$expenses->advance_dup_cheque_num == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_dup_cheque_num == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="dup_bill_num" name="dup_bill_num" disabled>
+                        <option value="On" {{$expenses->advance_dup_bill_num == "On" ? 'selected' : ''}}>On</option>
+                        <option value="Off" {{$expenses->advance_dup_bill_num == "Off" ? 'selected' : ''}}>Off</option>
+                    </select>
+                    <select class="text-dark font-weight-bold" id="inactive_time" name="inactive_time" disabled>
+                        <option value="1" {{$expenses->advance_inactive_time == "1" ? 'selected' : ''}}>1 Hour</option>
+                        <option value="2" {{$expenses->advance_inactive_time == "2" ? 'selected' : ''}}>2 Hours</option>
+                        <option value="3" {{$expenses->advance_inactive_time == "3" ? 'selected' : ''}}>3 Hours</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <a href="" class="fa fa-pencil"></a>
+                    <a href="#" id="toggle_edit_other_preferences" class="fa fa-pencil"></a>
                 </div>
             </div>
             <div class="col-md-12 mt-3 mb-4"></div>
             <div class="float-right mb-5">
-                <button class="btn btn-success rounded">Save</button>
+                <button id="update_advance" class="btn btn-success rounded">Save</button>
             </div>
+        </form>
         </div>
     </div>
 </div>
@@ -651,6 +734,31 @@ $(document).ready(function () {
 			data: $('#expenses_form').serialize(),
 			success: function (data) {
                 alert("updated expenses!")
+
+                $('select').prop('disabled', true);
+                $('input').prop('readonly', true);
+			},
+			error: function (data) {
+				alert(data)
+			}
+		});
+    });
+
+    $("#update_advance").click(function (event) {
+        event.preventDefault();
+        
+        $('select:disabled').prop('disabled', false);
+
+		$.ajax({
+			method: "POST",
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url: "{{ route('update_advance') }}",
+			dataType: "text",
+			data: $('#advance_form').serialize(),
+			success: function (data) {
+                alert("updated advance!")
 
                 $('select').prop('disabled', true);
                 $('input').prop('readonly', true);

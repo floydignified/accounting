@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Company;
 use App\Sales;
 use App\Expenses;
+use App\Advance;
 
 class CompanyController extends Controller
 {
@@ -68,5 +69,34 @@ class CompanyController extends Controller
         $expenses->expenses_use_purchase_order = $request->use_purchase_order;
         $expenses->expenses_purchase_order_email_message = $request->purchase_order_email_message;
         $expenses->save();
+    }
+
+    public function update_advance(Request $request)
+    {
+        $advance = new Advance;
+        $advance = Advance::first();
+        $advance->advance_first_month_of_fiscal_year = $request->first_month_of_fiscal_year;
+        $advance->advance_first_month_of_tax_year = $request->first_month_of_tax_year;
+        $advance->advance_accounting_method = $request->accounting_method;
+        $advance->advance_close_book = $request->close_book;
+        $advance->advance_tax_form = $request->advance_tax_form;
+        $advance->advance_enable_acc_number = $request->enable_acc_number;
+        $advance->advance_track_classes = $request->track_classes;
+        $advance->advance_track_location = $request->track_location;
+        $advance->advance_prefill_form = $request->prefill_form;
+        $advance->advance_apply_credit = $request->apply_credit;
+        $advance->advance_invoice_unbilled_activity = $request->invoice_unbilled_activity;
+        $advance->advance_apply_bill_payment = $request->apply_bill_payment;
+        $advance->advance_add_service_field = $request->add_service_field;
+        $advance->advance_single_time_activity_billable = $request->single_time_activity_billable;
+        $advance->advance_language = $request->language;
+        $advance->advance_home_currency = $request->home_currency;
+        $advance->advance_multi_currency = $request->multi_currency;
+        $advance->advance_date_format = $request->date_format;
+        $advance->advance_number_format = $request->number_format;
+        $advance->advance_dup_cheque_num = $request->dup_cheque_num;
+        $advance->advance_dup_bill_num = $request->dup_bill_num;
+        $advance->advance_inactive_time = $request->inactive_time;
+        $advance->save();
     }
 }

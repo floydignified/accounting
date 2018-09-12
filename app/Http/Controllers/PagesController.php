@@ -8,6 +8,7 @@ use App\User;
 use App\Company;
 use App\Sales;
 use App\Expenses;
+use App\Advance;
 
 class PagesController extends Controller
 {
@@ -79,7 +80,8 @@ class PagesController extends Controller
         $company = Company::first();
         $sales = Sales::first();
         $expenses = Expenses::first();
-        return view('pages.accountsandsettings', compact('company', 'sales', 'expenses'));
+        $advance = Advance::first();
+        return view('pages.accountsandsettings', compact('company', 'sales', 'expenses', 'advance'));
     }
     public function customformstyles(){
         return view('pages.customformstyles');
