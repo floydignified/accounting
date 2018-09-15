@@ -68,8 +68,8 @@
                                 <p class="font14">0 OVERDUE</p>
                             </div>
                             <div class="col-md-2 bg-grey">
-                                <h3>PHP2,000</h3>
-                                <p class="font14">1 OPEN INVOICE</p>
+                            <h3 class="invoice_total">PHP 2,000</h3>
+                                <p class="font14 invoice_count">1 OPEN INVOICE</p>
                             </div>
                             <div class="col-md-4 bg-ltgreen">
                                 <h3>PHP0</h3>
@@ -224,20 +224,24 @@
                                 <th class="text-center">STATUS</th>
                                 <th class="text-center">ACTION</th>
                             </tr>
+                            @foreach($sales_transaction as $transaction)
                             <tr>
                                 <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">7/26/2018</td>
-                                <td class="pt-3-half" contenteditable="true">Invoice</td>
-                                <td class="pt-3-half" contenteditable="true">1001</td>
-                                <td class="pt-3-half" contenteditable="true">test customer</td>
-                                <td class="pt-3-half" contenteditable="true">8/1/2018</td>
-                                <td class="pt-3-half" contenteditable="true">PHP 2,000.00</td>
-                                <td class="pt-3-half" contenteditable="true">PHP 2,000.00</td>
-                                <td class="pt-3-half" contenteditable="true">Open</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_date}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_type}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_no}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->customer_info->display_name}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_due_date}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->customer_info->opening_balance,2)}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->invoice_info->sum('st_i_total') ,2)}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_status}}</td>
+                                @if($transaction->st_status=="Open")
                                 <td>
-                                    <span class="table-add mb-3 mr-2"><a href="#!" class="text-info"><i aria-hidden="true" data-target="#receiveModal">Receive Payment</i></a></span>
+                                    <span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="{{$transaction->st_no}}" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden='true'>Receive Payment</i></a></span>
                                 </td>
+                                @endif
                             </tr>
+                            @endforeach
                             <!-- This is our clonable table line -->
                         </table>
                         <div class="pagination float-right">
@@ -437,16 +441,19 @@
                                 <th class="text-center">STATUS</th>
                                 <th class="text-center">ACTION</th>
                             </tr>
+                            @foreach($sales_transaction as $transaction)
+                            @if($transaction->st_type=="Invoice")
                             <tr>
                                 <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">7/26/2018</td>
-                                <td class="pt-3-half" contenteditable="true">Invoice</td>
-                                <td class="pt-3-half" contenteditable="true">1001</td>
-                                <td class="pt-3-half" contenteditable="true">test customer</td>
-                                <td class="pt-3-half" contenteditable="true">8/1/2018</td>
-                                <td class="pt-3-half" contenteditable="true">PHP 2,000.00</td>
-                                <td class="pt-3-half" contenteditable="true">PHP 2,000.00</td>
-                                <td class="pt-3-half" contenteditable="true">Open</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_date}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_type}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_no}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->customer_info->display_name}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_due_date}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->customer_info->opening_balance,2)}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->invoice_info->sum('st_p_amount'),2)}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_status}}</td>
+                                <!-- <td class="pt-3-half" contenteditable="true">{{$transaction->st_action}}</td> -->
                                 <td>
                                     <span class="table-add mb-3 mr-2">
                                         <a href="#!" class="text-info"><i aria-hidden="true">Receive Payment</i></a>
@@ -464,7 +471,8 @@
                                     </span>
                                 </td>
                             </tr>
-                            <!-- This is our clonable table line -->
+                            @endif
+                            @endforeach
                         </table>
                         <div class="pagination float-right">
                             <a class="pl-2 active" href="#">&laquo;First</a>
@@ -623,8 +631,8 @@
                                 <p>0 OVERDUE</p>
                             </div>
                             <div class="col-md-2 bg-grey">
-                                <h3>PHP2,000</h3>
-                                <p>1 OPEN INVOICE</p>
+                                <h3 class="invoice_total">PHP 2,000</h3>
+                                <p class="invoice_count">1 OPEN INVOICE</p>
                             </div>
                             <div class="col-md-4 bg-ltgreen">
                                 <h3>PHP0</h3>
@@ -651,15 +659,19 @@
                                 <th class="text-center">OPEN BALANCE</th>
                                 <th class="text-center">ACTION</th>
                             </tr>
+                            @foreach($customers as $customer)
                             <tr>
                                 <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">test customer</td>
-                                <td class="pt-3-half" contenteditable="true">09321654987</td>
-                                <td class="pt-3-half" contenteditable="true">PHP 2,000.00</td>
+                                <td class="pt-3-half" contenteditable="true">{{$customer->display_name}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$customer->phone}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($customer->opening_balance,2)}}</td>
                                 <td>
                                     <span class="table-add mb-3 mr-2"><a href="#!" class="text-info"><i aria-hidden="true">Receive Payment</i></a></span>
                                 </td>
                             </tr>
+                            @endforeach
+                                
+                            
                             <!-- This is our clonable table line -->
                         </table>
                         <div class="pagination float-right">
@@ -907,16 +919,17 @@
                                 <th class="text-center">REORDER POINT</th>
                                 <th class="text-center">ACTION</th>
                             </tr>
+                            @foreach($products_and_services as $product_and_service)
                             <tr>
                                 <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">test</td>
-                                <td class="pt-3-half" contenteditable="true">2</td>
-                                <td class="pt-3-half" contenteditable="true">Inventory</td>
-                                <td class="pt-3-half" contenteditable="true">sample desc</td>
-                                <td class="pt-3-half" contenteditable="true">1000.00</td>
-                                <td class="pt-3-half" contenteditable="true">400.00</td>
-                                <td class="pt-3-half" contenteditable="true">3</td>
-                                <td class="pt-3-half" contenteditable="true">1</td>
+                                <td class="pt-3-half" contenteditable="true">{{$product_and_service->product_name}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$product_and_service->product_sku}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$product_and_service->product_type}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$product_and_service->product_sales_description}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($product_and_service->product_sales_price,2)}}</td>
+                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($product_and_service->product_cost,2)}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$product_and_service->product_qty}}</td>
+                                <td class="pt-3-half" contenteditable="true">{{$product_and_service->product_reorder_point}}</td>
                                 <td>
                                     <span class="table-add mb-3 mr-2"><a href="#!" class="text-info"><i aria-hidden="true">Edit</i></a></span>
                                     <select>
@@ -927,6 +940,7 @@
                                     </select>
                                 </td>
                             </tr>
+                            @endforeach
                             <!-- This is our clonable table line -->
                         </table>
                         <div class="pagination float-right">
@@ -1059,4 +1073,43 @@
                 </div>
             </div>
         </div>
+
+<script>
+$(document).ready(function(){
+
+    var total_invoice_count = 0;
+    var total_invoice_data = 0;
+
+    @foreach($sales_transaction as $transaction)
+        @if($transaction->st_type == "Invoice" && $transaction->st_status == "Open")
+            total_invoice_count++;
+            total_invoice_data += {{$transaction->invoice_info->sum('st_i_total')}};
+        @endif
+    @endforeach
+
+    $('.invoice_count').text(total_invoice_count + " OPEN INVOICE");
+    $('.invoice_total').text("PHP " + total_invoice_data);
+
+    $(document).on('click', '.receive_payment', function(){
+        var id = $(this).attr('id');
+        
+        @foreach($sales_transaction as $transaction)
+        if(id == {{$transaction->st_no}}){
+            $('#sales_transaction_number').val('{{$transaction->st_no}}');
+            
+            var customer_transaction = {{$transaction->st_customer_id}};
+            @foreach($customers as $customer)
+                if({{$customer->customer_id}} == customer_transaction){
+                    $('#paymentcustomer').val('{{$customer->display_name}}');
+                    $('#paymentbalance').text('PHP {{ number_format($customer->opening_balance,2) }}');
+                    $('#payment_customer_id').val('{{$customer->customer_id}}');
+                    
+                }
+            @endforeach
+        }
+        @endforeach
+    });
+
+});  
+</script>
 @endsection

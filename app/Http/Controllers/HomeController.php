@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Customers;
+use App\ProductsAndServices;
 use Auth;
 
 class HomeController extends Controller
@@ -25,6 +27,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('pages.reports');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        return view('pages.reports', compact('customers', 'products_and_services'));
     }
 }

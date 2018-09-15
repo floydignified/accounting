@@ -11,13 +11,16 @@
         <script src="{{asset('js/lib/chart-js/Chart.bundle.js')}}"></script>
         <script src="{{asset('js/dashboard.js')}}"></script>
         <script src="{{asset('js/widgets.js')}}"></script>
-        <script src="{{asset('jquery-3.3.1.min.js')}}"</'script>
+        <script src="{{asset('jquery-3.3.1.min.js')}}"></script>
         <script src="{{asset('js/lib/vector-map/jquery.vmap.js')}}"></script>
         <script src="{{asset('js/lib/vector-map/jquery.vmap.min.js')}}"></script>
         <script src="{{asset('js/lib/vector-map/jquery.vmap.sampledata.js')}}"></script>
         <script src="{{asset('js/lib/vector-map/country/jquery.vmap.world.js')}}"></script>
         <script src="{{asset('js/lib/chart-js/Chart.bundle.js')}}"></script>
         <script src="{{asset('js/lib/chart-js/chartjs-init.js')}}"></script>
+
+        <!-- Alert -->
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         
         <!--  flot-chart js -->
         <script src="{{asset('js/lib/flot-chart/excanvas.min.js')}}"></script>

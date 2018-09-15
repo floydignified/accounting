@@ -21,6 +21,10 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/update_expenses', 'CompanyController@update_expenses')->name('update_expenses');
     Route::post('/update_advance', 'CompanyController@update_advance')->name('update_advance');
 
+    Route::post('/add_customer', 'CustomersController@add_customer')->name('add_customer');
+    Route::post('/add_invoice', 'CustomersController@add_invoice')->name('add_invoice');
+    Route::post('/add_payment', 'CustomersController@add_payment')->name('add_payment');
+
     Route::get('/reports', 'PagesController@reports');
 
     Route::get('/invoice', 'PagesController@invoice');
@@ -28,6 +32,7 @@ Route::group(['middleware'=>['auth']], function() {
     Route::get('/estimate', 'PagesController@estimate');
     Route::get('/creditnotice', 'PagesController@creditnotice');
     Route::get('/salesreceipt', 'PagesController@salesreceipt');
+    Route::get('/sales', 'PagesController@sales');
     Route::get('/refundreceipt', 'PagesController@refundreceipt');
     Route::get('/delayedcredit', 'PagesController@delayedcredit');
     Route::get('/delayedcharge', 'PagesController@delayedcharge');

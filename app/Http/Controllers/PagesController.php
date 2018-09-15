@@ -9,11 +9,16 @@ use App\Company;
 use App\Sales;
 use App\Expenses;
 use App\Advance;
+use App\Customers;
+use App\ProductsAndServices;
+USE App\SalesTransaction;
 
 class PagesController extends Controller
 {
     public function reports(){
-        return view('pages.reports');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        return view('pages.reports', compact('customers', 'products_and_services'));
     }
     public function invoice(){
         return view('pages.invoice');
@@ -29,6 +34,12 @@ class PagesController extends Controller
     }
     public function salesreceipt(){
         return view('pages.salesreceipt');
+    }
+    public function sales(){
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.sales', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     public function refundreceipt(){
         return view('pages.refundreceipt');
@@ -70,7 +81,10 @@ class PagesController extends Controller
     }
     
     public function statements(){
-        return view('pages.statements');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.statements', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     public function investqtyadj(){
         return view('pages.investqtyadj');
@@ -81,30 +95,50 @@ class PagesController extends Controller
         $sales = Sales::first();
         $expenses = Expenses::first();
         $advance = Advance::first();
-        return view('pages.accountsandsettings', compact('company', 'sales', 'expenses', 'advance'));
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        return view('pages.accountsandsettings', compact('company', 'sales', 'expenses', 'advance', 'customers', 'products_and_services'));
     }
     public function customformstyles(){
-        return view('pages.customformstyles');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.customformstyles', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     public function alllists(){
         return view('pages.alllists');
     }
     
     public function recurringtransactions(){
-        return view('pages.recurringtransactions');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.recurringtransactions', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     public function attachments(){
-        return view('pages.attachments');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.attachments', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     //
     public function importdata(){
-        return view('pages.importdata');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.importdata', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     public function exportdata(){
-        return view('pages.exportdata');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.exportdata', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     public function auditlog(){
-        return view('pages.auditlog');
+        $customers = Customers::all();
+        $products_and_services = ProductsAndServices::all();
+        $sales_transaction = SalesTransaction::all();
+        return view('pages.auditlog', compact('customers', 'products_and_services', 'sales_transaction'));
     }
     
 

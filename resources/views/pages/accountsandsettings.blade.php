@@ -683,13 +683,13 @@ $(document).ready(function () {
 			dataType: "text",
 			data: $('#company_form').serialize(),
 			success: function (data) {
-                alert("updated company!")
+                swal("Done!", "Updated company", "success");
                 
                 $('select').prop('disabled', true);
                 $('input').prop('readonly', true);
 			},
 			error: function (data) {
-				alert(data)
+				swal("Error!", "Update failed", "error");
 			}
 		});
     });
@@ -708,13 +708,13 @@ $(document).ready(function () {
 			dataType: "text",
 			data: $('#sales_form').serialize(),
 			success: function (data) {
-                alert("updated sales!")
+                swal("Done!", "Updated sales", "success");
 
                 $('select').prop('disabled', true);
                 $('input').prop('readonly', true);
 			},
 			error: function (data) {
-				alert(data)
+				swal("Error!", "Update failed", "error");
 			}
 		});
     });
@@ -733,13 +733,13 @@ $(document).ready(function () {
 			dataType: "text",
 			data: $('#expenses_form').serialize(),
 			success: function (data) {
-                alert("updated expenses!")
+                swal("Done!", "Updated expenses", "success");
 
                 $('select').prop('disabled', true);
                 $('input').prop('readonly', true);
 			},
 			error: function (data) {
-				alert(data)
+				swal("Error!", "Update failed", "error");
 			}
 		});
     });
@@ -758,13 +758,13 @@ $(document).ready(function () {
 			dataType: "text",
 			data: $('#advance_form').serialize(),
 			success: function (data) {
-                alert("updated advance!")
+                swal("Done!", "Updated advance", "success");
 
                 $('select').prop('disabled', true);
                 $('input').prop('readonly', true);
 			},
 			error: function (data) {
-				alert(data)
+				swal("Error!", "Update failed", "error");
 			}
 		});
     });
