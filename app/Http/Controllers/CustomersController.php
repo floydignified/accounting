@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Customers;
 use App\SalesTransaction;
 use App\StInvoice;
+use App\StEstimate;
+use App\ProductsAndServices;
 
 class CustomersController extends Controller
 {
@@ -41,7 +43,7 @@ class CustomersController extends Controller
 
     public function add_invoice(Request $request)
     {
-        $sales_number = SalesTransaction::count() + 1;
+        $sales_number = SalesTransaction::count() + 1001;
 
         $sales_transaction = new SalesTransaction;
         $sales_transaction->st_no = $sales_number;
@@ -58,6 +60,7 @@ class CustomersController extends Controller
         $sales_transaction->st_note = $request->note;
         $sales_transaction->st_memo = $request->memo;
         $sales_transaction->st_i_attachment = $request->attachment;
+        $sales_transaction->st_balance = $request->total_balance;
         $sales_transaction->save();
 
         $customer = new Customers;
@@ -74,11 +77,16 @@ class CustomersController extends Controller
             $st_invoice->st_p_method = null;
             $st_invoice->st_p_reference_no = null;
             $st_invoice->st_p_deposit_to = null;
-            $st_invoice->st_p_amount = null;
             $st_invoice->save();
 
             $customer->opening_balance = $customer->opening_balance + $request->input('product_qty'.$x) * $request->input('select_product_rate'.$x);
             $customer->save();
+        }
+
+        if($request->sales_transaction_number_estimate != '0'){
+            $sales_transaction_estimate = SalesTransaction::where('st_no', $request->sales_transaction_number_estimate)->first();
+            $sales_transaction_estimate->st_status = "Closed";
+            $sales_transaction_estimate->save();
         }
     }
 
@@ -88,7 +96,7 @@ class CustomersController extends Controller
         $customer->opening_balance = $customer->opening_balance - $request->p_amount;
         $customer->save();
 
-        $sales_number = SalesTransaction::count() + 1;
+        $sales_number = SalesTransaction::count() + 1001;
 
         $sales_transaction = new SalesTransaction;
         $sales_transaction->st_no = $sales_number;
@@ -105,6 +113,8 @@ class CustomersController extends Controller
         $sales_transaction->st_note = null;
         $sales_transaction->st_memo = $request->p_memo;
         $sales_transaction->st_i_attachment = $request->attachment;
+        $sales_transaction->st_amount_paid = $request->p_amount;
+        $sales_transaction->st_payment_for = $request->sales_transaction_number;
         $sales_transaction->save();
 
         $st_invoice = new StInvoice;
@@ -116,8 +126,193 @@ class CustomersController extends Controller
         $st_invoice->save();
 
         $old_invoice_transaction = SalesTransaction::find($request->sales_transaction_number);
-        $old_invoice_transaction->st_status = 'Closed';
-        $old_invoice_transaction->save();
+        if($old_invoice_transaction->st_balance <= $request->p_amount){
+            $old_invoice_transaction->st_balance = $old_invoice_transaction->st_balance - $request->p_amount;
+            $old_invoice_transaction->st_status = 'Closed';
+            $old_invoice_transaction->save();
+        }else{
+            $old_invoice_transaction->st_balance = $old_invoice_transaction->st_balance - $request->p_amount;
+            $old_invoice_transaction->save();
+        }
+        
 
+    }
+
+    public function add_estimate(Request $request)
+    {
+        $sales_number = SalesTransaction::count() + 1001;
+
+        $sales_transaction = new SalesTransaction;
+        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_date = $request->e_date;
+        $sales_transaction->st_type = $request->transaction_type_estimate;
+        $sales_transaction->st_term = null;
+        $sales_transaction->st_customer_id = $request->e_customer;
+        $sales_transaction->st_due_date = $request->e_due_date;
+        $sales_transaction->st_status = 'Pending';
+        $sales_transaction->st_action = '';
+        $sales_transaction->st_email = $request->e_email;
+        $sales_transaction->st_send_later = $request->e_send_later;
+        $sales_transaction->st_bill_address = $request->e_bill_address;
+        $sales_transaction->st_note = $request->e_note;
+        $sales_transaction->st_memo = $request->e_memo;
+        $sales_transaction->st_i_attachment = $request->e_attachment;
+        $sales_transaction->st_balance = $request->total_balance_estimate;
+        $sales_transaction->save();
+
+        $customer = new Customers;
+        $customer = Customers::find($request->customer);
+
+        for($x=0;$x<$request->product_count_estimate;$x++){
+            $st_estimate = new StEstimate;
+            $st_estimate->st_e_no = $sales_number;
+            $st_estimate->st_e_product = $request->input('select_product_name_estimate'.$x);
+            $st_estimate->st_e_desc = $request->input('select_product_description_estimate'.$x);
+            $st_estimate->st_e_qty = $request->input('product_qty_estimate'.$x);
+            $st_estimate->st_e_rate = $request->input('select_product_rate_estimate'.$x);
+            $st_estimate->st_e_total = $request->input('product_qty_estimate'.$x) * $request->input('select_product_rate_estimate'.$x);
+            $st_estimate->st_p_method = null;
+            $st_estimate->st_p_reference_no = null;
+            $st_estimate->st_p_deposit_to = null;
+            $st_estimate->save();
+
+        }
+    }
+
+    public function refresh_customers_table(){
+        $customers = Customers::all();
+        return \DataTables::of($customers)
+        ->addColumn('action', function($customers){
+            $sales_transaction = SalesTransaction::where('st_customer_id', $customers->customer_id)->first();
+            
+            if($sales_transaction){
+                if($sales_transaction->st_status == "Open"){
+                    return '<span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden="true">Receive Payment</i></a></span>';
+                }else{
+                    return '<span class="table-add mb-3 mr-2">N/A</span>';
+                }
+            }else{
+                return '<span class="table-add mb-3 mr-2">N/A</span>';
+            }
+            
+                         
+        })
+        ->make(true);
+    }
+
+    public function refresh_sales_table(){
+        $sales_transaction = SalesTransaction::all();
+
+        return \DataTables::of($sales_transaction)
+        ->addColumn('checkbox', function($sales_transaction){
+            return '<span> try </span>';
+        })
+        ->addColumn('action', function($sales_transaction){
+            if($sales_transaction->st_status == "Open" && $sales_transaction->st_type == "Invoice"){
+                return '<span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden="true">Receive Payment</i></a></span>';
+            }else if($sales_transaction->st_status == "Pending" && $sales_transaction->st_type == "Estimate"){
+                return '<span class="table-add mb-3 mr-2"><a class="text-info create_invoice" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#invoicemodal"><i aria-hidden="true">Create Invoice</i></a></span>';
+            }else{
+                return '<span class="table-add mb-3 mr-2">N/A</span>';
+            }                
+        })
+        ->addColumn('customer_name', function($sales_transaction){
+            return $sales_transaction->customer_info->display_name;             
+        })
+        ->addColumn('customer_balance', function($sales_transaction){
+            return 'PHP '.number_format($sales_transaction->st_balance, 2);             
+        })
+        ->addColumn('transaction_total', function($sales_transaction){
+            if($sales_transaction->st_type == "Invoice"){
+                return 'PHP '.number_format($sales_transaction->invoice_info->sum('st_i_total'), 2);  
+            }else if($sales_transaction->st_type == "Estimate"){
+                return 'PHP '.number_format($sales_transaction->estimate_info->sum('st_e_total'), 2);  
+            }else{
+                return 'PHP '.number_format($sales_transaction->st_amount_paid, 2);  
+            }           
+        })
+        ->editColumn('st_due_date', function ($data) {
+            if($data->st_due_date == NULL){
+                return "N/A";
+            }else{
+                return $data->st_due_date;
+            }
+        })
+        ->make(true);
+    }
+
+    public function refresh_sales_table_invoice(){
+        $sales_transaction = SalesTransaction::where('st_type', 'Invoice');
+
+        return \DataTables::of($sales_transaction)
+        ->addColumn('checkbox', function($sales_transaction){
+            return '<span> try </span>';
+        })
+        ->addColumn('action', function($sales_transaction){
+            if($sales_transaction->st_status == "Open"){
+                return '<span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden="true">Receive Payment</i></a>
+                <select>
+                <option></option>
+                <option>Print</option>
+                <option>Send</option>
+                <option>View/Edit</option>
+                <option>Send Reminder</option>
+                <option>Print packing slip</option>
+                <option>Copy</option>
+                <option>Delete</option>
+                <option>Void</option>
+                </select></span>';
+            }else{
+                return '<span class="table-add mb-3 mr-2">Received
+                <select>
+                <option></option>
+                <option>Print</option>
+                <option>Send</option>
+                <option>View/Edit</option>
+                <option>Send Reminder</option>
+                <option>Print packing slip</option>
+                <option>Copy</option>
+                <option>Delete</option>
+                <option>Void</option>
+                </select></span>';
+            }                
+        })
+        ->addColumn('customer_name', function($sales_transaction){
+            return $sales_transaction->customer_info->display_name;             
+        })
+        ->addColumn('customer_balance', function($sales_transaction){
+            return 'PHP '.number_format($sales_transaction->st_balance, 2);             
+        })
+        ->addColumn('transaction_total', function($sales_transaction){
+            return 'PHP '.number_format($sales_transaction->invoice_info->sum('st_i_total'), 2);             
+        })
+        ->editColumn('st_due_date', function ($data) {
+            if($data->st_due_date == NULL){
+                return "N/A";
+            }else{
+                return $data->st_due_date;
+            }
+        })
+        ->make(true);
+    }
+
+    public function get_all_transactions(Request $request){
+        $sales_transaction = SalesTransaction::where('st_no', $request->id)->first();
+        return $sales_transaction;
+    }
+
+    public function get_all_estimates(Request $request){
+        $st_estimates = StEstimate::where('st_e_no', $request->id)->get();
+        $products = ProductsAndServices::all();
+
+        foreach($st_estimates as $estimate){
+            foreach($products as $product){
+                if($estimate->st_e_product == $product->product_id){
+                    $estimate['st_e_product_name'] = $product->product_name;
+                }
+            }
+         }
+
+        return $st_estimates;
     }
 }

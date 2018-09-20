@@ -342,5 +342,28 @@ jQuery(document).ready(function($) {
 
 	});
 	
+	$("#add_customer_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#addcustomermodal').modal('hide');
+	});
+
+	$("#add_invoice_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#invoicemodal').modal('hide');
+	});
+
+	$("#add_payment_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#receivepaymentmodal').modal('hide');
+	});
+
+	$("#add_estimate_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#estimatemodal').modal('hide');
+	});
 
 });

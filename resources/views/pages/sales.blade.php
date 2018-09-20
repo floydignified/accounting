@@ -56,8 +56,8 @@
                     <div id="table" class="table-editable">
                         <div class="col-md-12 text-white p-0 mb-5">
                             <div class="col-md-2 bg-ltblue pb-0">
-                                <h3>PHP0</h3>
-                                <p class="font14">0 ESTIMATE</p>
+                                <h3  class="estimate_total">PHP0</h3>
+                                <p class="font14 estimate_count">0 ESTIMATE</p>
                             </div>
                             <div class="col-md-2 bg-blue">
                                 <h3>PHP0</h3>
@@ -211,8 +211,8 @@
                             <li class="fa fa-save pl-2"><a href=""></a></li>
                             <li class="fa fa-cog pl-2"><a href=""></a></li>
                         </div>
-                        <table id="salestable" class="table table-bordered table-responsive-md table-striped text-center font14">
-                            <tr>
+                        <table id="salestable" class="table table-bordered table-responsive-md table-striped text-center font14" width="100%">
+                            <thead>
                                 <th class="text-center"><input type="checkbox" name=""></th>
                                 <th class="text-center">DATE</th>
                                 <th class="text-center">TYPE</th>
@@ -223,34 +223,10 @@
                                 <th class="text-center">TOTAL</th>
                                 <th class="text-center">STATUS</th>
                                 <th class="text-center">ACTION</th>
-                            </tr>
-                            @foreach($sales_transaction as $transaction)
-                            <tr>
-                                <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_date}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_type}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_no}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->customer_info->display_name}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_due_date}}</td>
-                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->customer_info->opening_balance,2)}}</td>
-                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->invoice_info->sum('st_i_total') ,2)}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_status}}</td>
-                                @if($transaction->st_status=="Open")
-                                <td>
-                                    <span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="{{$transaction->st_no}}" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden='true'>Receive Payment</i></a></span>
-                                </td>
-                                @endif
-                            </tr>
-                            @endforeach
+                            </thead>
+                            
                             <!-- This is our clonable table line -->
                         </table>
-                        <div class="pagination float-right">
-                            <a class="pl-2 active" href="#">&laquo;First</a>
-                            <a class="pl-2" href="#">Previous</a>
-                            <a class="pl-2">1-1 of 1</a>
-                            <a class="pl-2" href="#">Next</a>
-                            <a class="pl-2" href="#">Last&raquo;</a>
-                        </div>
                     </div>
                     <div class="modal fade" id="receiveModal" tabindex="-1" role="dialog" aria-labelledby="receiveModalLabel" aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog modal-lg" role="document">
@@ -428,8 +404,8 @@
                         <div class="d-inline-flex float-right mb-3">
                             <button class="btn btn-success rounded"><a href="invoice.php" class="text-white" data-toggle="modal" data-target="#invoicemodal"> New Invoice</a></button>
                         </div>
-                        <table class="salestableinvoice table table-bordered table-responsive-md table-striped text-center font14">
-                            <tr>
+                        <table id="salestableinvoice" class="salestableinvoice table table-bordered table-responsive-md table-striped text-center font14" width="100%">
+                            <thead>
                                 <th class="text-center"><input type="checkbox" name=""></th>
                                 <th class="text-center">DATE</th>
                                 <th class="text-center">TYPE</th>
@@ -440,47 +416,8 @@
                                 <th class="text-center">TOTAL</th>
                                 <th class="text-center">STATUS</th>
                                 <th class="text-center">ACTION</th>
-                            </tr>
-                            @foreach($sales_transaction as $transaction)
-                            @if($transaction->st_type=="Invoice")
-                            <tr>
-                                <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_date}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_type}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_no}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->customer_info->display_name}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_due_date}}</td>
-                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->customer_info->opening_balance,2)}}</td>
-                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($transaction->invoice_info->sum('st_p_amount'),2)}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$transaction->st_status}}</td>
-                                <!-- <td class="pt-3-half" contenteditable="true">{{$transaction->st_action}}</td> -->
-                                <td>
-                                    <span class="table-add mb-3 mr-2">
-                                        <a href="#!" class="text-info"><i aria-hidden="true">Receive Payment</i></a>
-                                        <select>
-                                            <option></option>
-                                            <option>Print</option>
-                                            <option>Send</option>
-                                            <option>View/Edit</option>
-                                            <option>Send Reminder</option>
-                                            <option>Print packing slip</option>
-                                            <option>Copy</option>
-                                            <option>Delete</option>
-                                            <option>Void</option>
-                                        </select>
-                                    </span>
-                                </td>
-                            </tr>
-                            @endif
-                            @endforeach
+                            </thead>
                         </table>
-                        <div class="pagination float-right">
-                            <a class="pl-2 active" href="#">&laquo;First</a>
-                            <a class="pl-2" href="#">Previous</a>
-                            <a class="pl-2">1-1 of 1</a>
-                            <a class="pl-2" href="#">Next</a>
-                            <a class="pl-2" href="#">Last&raquo;</a>
-                        </div>
                     </div>
                     <div class="modal fade" id="staticModal" tabindex="-1" role="dialog" aria-labelledby="staticModalLabel" aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog modal-lg" role="document">
@@ -619,8 +556,8 @@
     
                         <div class="col-md-12 text-white p-0 mb-5">
                             <div class="col-md-2 bg-ltblue pb-0">
-                                <h3>PHP0</h3>
-                                <p>0 ESTIMATE</p>
+                                <h3  class="estimate_total">PHP0</h3>
+                                <p class="estimate_count">0 ESTIMATE</p>
                             </div>
                             <div class="col-md-2 bg-blue">
                                 <h3>PHP0</h3>
@@ -651,25 +588,14 @@
                             <li class="fa fa-save pl-2"><a href=""></a></li>
                             <li class="fa fa-cog pl-2"><a href=""></a></li>
                         </div>
-                        <table id="customertable" class="table table-bordered table-responsive-md table-striped text-center font14">
-                            <tr>
+                        <table id="customertable" class="table table-bordered table-responsive-md table-striped text-center font14" width="100%">
+                            <thead>
                                 <th class="text-center"><input type="checkbox" name=""></th>
                                 <th class="text-center">CUSTOMER/COMPANY</th>
                                 <th class="text-center">PHONE</th>
                                 <th class="text-center">OPEN BALANCE</th>
                                 <th class="text-center">ACTION</th>
-                            </tr>
-                            @foreach($customers as $customer)
-                            <tr>
-                                <td class="pt-3-half" contenteditable="true"><input type="checkbox" name=""></td>
-                                <td class="pt-3-half" contenteditable="true">{{$customer->display_name}}</td>
-                                <td class="pt-3-half" contenteditable="true">{{$customer->phone}}</td>
-                                <td class="pt-3-half" contenteditable="true">PHP {{number_format($customer->opening_balance,2)}}</td>
-                                <td>
-                                    <span class="table-add mb-3 mr-2"><a href="#!" class="text-info"><i aria-hidden="true">Receive Payment</i></a></span>
-                                </td>
-                            </tr>
-                            @endforeach
+                            </thead>
                                 
                             
                             <!-- This is our clonable table line -->
@@ -1079,36 +1005,126 @@ $(document).ready(function(){
 
     var total_invoice_count = 0;
     var total_invoice_data = 0;
+    var total_estimate_count = 0;
+    var total_estimate_data = 0;
 
     @foreach($sales_transaction as $transaction)
         @if($transaction->st_type == "Invoice" && $transaction->st_status == "Open")
             total_invoice_count++;
             total_invoice_data += {{$transaction->invoice_info->sum('st_i_total')}};
+        @elseif($transaction->st_type == "Estimate" && $transaction->st_status == "Pending")
+            total_estimate_count++;
+            total_estimate_data += {{$transaction->estimate_info->sum('st_e_total')}};
         @endif
     @endforeach
 
     $('.invoice_count').text(total_invoice_count + " OPEN INVOICE");
     $('.invoice_total').text("PHP " + total_invoice_data);
+    $('.estimate_count').text(total_estimate_count + " OPEN ESTIMATE");
+    $('.estimate_total').text("PHP " + total_estimate_data);
+
+    
 
     $(document).on('click', '.receive_payment', function(){
         var id = $(this).attr('id');
         
-        @foreach($sales_transaction as $transaction)
-        if(id == {{$transaction->st_no}}){
-            $('#sales_transaction_number').val('{{$transaction->st_no}}');
-            
-            var customer_transaction = {{$transaction->st_customer_id}};
-            @foreach($customers as $customer)
-                if({{$customer->customer_id}} == customer_transaction){
-                    $('#paymentcustomer').val('{{$customer->display_name}}');
-                    $('#paymentbalance').text('PHP {{ number_format($customer->opening_balance,2) }}');
-                    $('#payment_customer_id').val('{{$customer->customer_id}}');
-                    
-                }
-            @endforeach
-        }
-        @endforeach
+        $.ajax({
+            method: "GET",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('get_all_transactions') }}",
+            dataType: "text",
+            data: {id:id},
+            success: function (value) {
+                var data = JSON.parse(value);
+                $('#sales_transaction_number').val(data.st_no);
+                var customer_transaction = data.st_customer_id;
+                @foreach($customers as $customer)
+                    if({{$customer->customer_id}} == customer_transaction){
+                        $('#paymentcustomer').val('{{$customer->display_name}}');
+                        $('#paymentbalance').text('PHP {{ number_format($customer->opening_balance,2) }}');
+                        $('#payment_customer_id').val('{{$customer->customer_id}}');
+                        $('#p_payment_method').val('{{$customer->payment_method}}');
+                    }
+                 @endforeach
+            },
+            error: function (data) {
+                swal("Error!", "Transaction failed", "error");
+            }
+        });
     });
+
+    $(document).on('click', '.create_invoice', function(){
+        var id = $(this).attr('id');
+        
+        $.ajax({
+            method: "GET",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('get_all_transactions') }}",
+            dataType: "text",
+            data: {id:id},
+            success: function (value) {
+                var data = JSON.parse(value);
+                var customer_transaction = data.st_customer_id;
+                @foreach($customers as $customer)
+                    if({{$customer->customer_id}} == customer_transaction){
+                        $('#sales_transaction_number_estimate').val(data.st_no);
+                        $('#invoicecustomer').append('<option value="{{$customer->customer_id}}" selected>{{$customer->display_name}}</option>');
+                        $('#invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#term').val('{{$customer->terms}}');
+                        $('#invoicedate').val(data.st_date);
+                        $('#invoiceduedate').val(data.st_due_date);
+                        $('#note').val(data.st_note);
+                        $('#memo').val(data.st_memo);
+                        
+                        $.ajax({
+                            method: "GET",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            url: "{{ route('get_all_estimates') }}",
+                            dataType: "text",
+                            data: {id:data.st_no},
+                            success: function (value) {
+                                var data = JSON.parse(value);
+
+                                console.log(data)
+                                for($x=0;$x<data.length;$x++){
+                                    var markup = '<tr class="invoice_lines" id="invoice_line'+$('#invoice_table tr').length+'"><td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="invoice_data product_select" id="select_product_name'+$('#invoice_table tr').length+'"><option value="'+data[$x].st_e_product+'">'+data[$x].st_e_product_name+'</option></select></td><td class="pt-3-half"><input class="invoice_data" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_e_desc+'"></td><td class="pt-3-half"><input type="number" class="invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" value="'+data[$x].st_e_qty+'"></td><td class="pt-3-half"><input class="invoice_data" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_e_rate+'"></td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'">'+data[$x].st_e_total+'</td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';
+            
+                                    $("#invoice_table").append(markup);
+                                }
+
+                                var total_invoice = 0;
+                                $('.product_total').each(function() {
+                                    var add_total = $(this).html();
+                                    if(add_total==""){
+                                        add_total=0;
+                                    }
+                                    total_invoice += parseFloat(add_total);
+                                    $('#invoicetotal').html(total_invoice);
+                                });
+                            },
+                            error: function (data) {
+                                swal("Error!", "Transaction failed", "error");
+                            }
+                        });
+
+                        
+                    }
+                 @endforeach
+            },
+            error: function (data) {
+                swal("Error!", "Transaction failed", "error");
+            }
+        });
+    });
+
 
 });  
 </script>

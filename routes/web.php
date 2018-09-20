@@ -24,6 +24,14 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/add_customer', 'CustomersController@add_customer')->name('add_customer');
     Route::post('/add_invoice', 'CustomersController@add_invoice')->name('add_invoice');
     Route::post('/add_payment', 'CustomersController@add_payment')->name('add_payment');
+    Route::post('/add_estimate', 'CustomersController@add_estimate')->name('add_estimate');
+
+    Route::get('/refresh_sales_table', 'CustomersController@refresh_sales_table')->name('refresh_sales_table');
+    Route::get('/refresh_sales_table_invoice', 'CustomersController@refresh_sales_table_invoice')->name('refresh_sales_table_invoice');
+    Route::get('/refresh_customers_table', 'CustomersController@refresh_customers_table')->name('refresh_customers_table');
+
+    Route::get('/get_all_transactions', 'CustomersController@get_all_transactions')->name('get_all_transactions');
+    Route::get('/get_all_estimates', 'CustomersController@get_all_estimates')->name('get_all_estimates');
 
     Route::get('/reports', 'PagesController@reports');
 

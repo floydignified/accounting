@@ -24,3 +24,5 @@
         <link rel="stylesheet" href="{{asset('css/modal.css')}}">
         <!-- Styles -->
        
+       <!-- DataTables -->
+       <link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">

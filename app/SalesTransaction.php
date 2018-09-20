@@ -22,6 +22,9 @@ class SalesTransaction extends Model
         'st_bill_address',
         'st_note',
         'st_memo',
+        'st_balance',
+        'st_amount_paid',
+        'st_payment_for',
         'st_i_attachment'
     );
 
@@ -33,6 +36,10 @@ class SalesTransaction extends Model
 
     public function invoice_info(){
 	    return $this->hasMany('App\StInvoice','st_i_no','st_no');
+    }
+
+    public function estimate_info(){
+	    return $this->hasMany('App\StEstimate','st_e_no','st_no');
     }
     
 }

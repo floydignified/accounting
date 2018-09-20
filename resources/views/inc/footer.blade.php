@@ -1,13 +1,11 @@
 <footer>
        
-        <script src="{{asset('js/vendor/jquery-2.1.4.min.js')}}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
         <script src="{{asset('js/plugins.js')}}"></script>
         <script src="{{asset('js/main.js')}}"></script>
         <script src="{{asset('js/donut.js')}}"></script>
         <script src="{{asset('js/redirect.js')}}"></script>
 
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="{{asset('js/lib/chart-js/Chart.bundle.js')}}"></script>
         <script src="{{asset('js/dashboard.js')}}"></script>
         <script src="{{asset('js/widgets.js')}}"></script>
@@ -21,6 +19,9 @@
 
         <!-- Alert -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+        <!-- DataTables -->
+        <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
         
         <!--  flot-chart js -->
         <script src="{{asset('js/lib/flot-chart/excanvas.min.js')}}"></script>
