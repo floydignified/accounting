@@ -25,6 +25,7 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/add_invoice', 'CustomersController@add_invoice')->name('add_invoice');
     Route::post('/add_payment', 'CustomersController@add_payment')->name('add_payment');
     Route::post('/add_estimate', 'CustomersController@add_estimate')->name('add_estimate');
+    Route::post('/add_sales_receipt', 'CustomersController@add_sales_receipt')->name('add_sales_receipt');
 
     Route::get('/refresh_sales_table', 'CustomersController@refresh_sales_table')->name('refresh_sales_table');
     Route::get('/refresh_sales_table_invoice', 'CustomersController@refresh_sales_table_invoice')->name('refresh_sales_table_invoice');

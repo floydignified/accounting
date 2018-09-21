@@ -366,4 +366,10 @@ jQuery(document).ready(function($) {
 		$('#estimatemodal').modal('hide');
 	});
 
+	$("#add_sales_receipt_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#salesreceiptmodal').modal('hide');
+	});
+
 });

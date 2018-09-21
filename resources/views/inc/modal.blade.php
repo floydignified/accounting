@@ -395,15 +395,15 @@
                     <div class="col-md-12 p-0 mt-3">
                         <div class="col-md-4 p-0 pr-3">
                             <p>Billing Address</p>
-                            <input type="text" name="e_bill_address" id="e_bill_address" class="w-100">
+                            <input type="text" name="e_bill_address" id="e_bill_address" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Estimate Date</p>
-                            <input type="date" name="e_date" id="e_date" class="w-100">
+                            <input type="date" name="e_date" id="e_date" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0">
                             <p>Expiration Date</p>
-                            <input type="date" name="e_due_date" id="e_due_date" class="w-100">
+                            <input type="date" name="e_due_date" id="e_due_date" class="w-100" required>
                         </div>
                     </div>
                     <table class="table table-bordered table-responsive-md table-striped text-left font14" id="estimate_table">
@@ -444,11 +444,11 @@
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 pl-0">
                             <p>Message Displayed on Estimate</p>
-                            <textarea rows="3" class="w-100" name="e_note" id="e_note"></textarea>
+                            <textarea rows="3" class="w-100" name="e_note" id="e_note" required></textarea>
                         </div>
                         <div class="col-md-6 pr-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100" name="e_memo" id="e_memo"></textarea>
+                            <textarea rows="3" class="w-100" name="e_memo" id="e_memo" required></textarea>
                         </div>
                     </div>
                     <div class="col-md-6 m-0 p-0 mt-3">
@@ -474,6 +474,11 @@
 </form>
 </div>
 <div class="modal fade p-0" id="salesreceiptmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_sales_receipt_form" onsubmit="addSalesReceipt()">
+{{ csrf_field() }}
+    <input id="transaction_type_sales_receipt" name="transaction_type_sales_receipt" value="Sales Receipt" hidden>
+    <input type="number" id="total_balance_sales_receipt" name="total_balance_sales_receipt" value="0" hidden>
+    <input id="product_count_sales_receipt" name="product_count_sales_receipt" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -486,13 +491,18 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-4 p-0 pr-3">
-                            <input id="salesrcustomer" type="text" name="" placeholder="Choose a customer" class="w-100">
+                            <select id="salesrcustomer" type="text" name="sr_customer" class="w-100" required>
+                                <option value=""></option>
+                                @foreach($customers as $customer)
+                                <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-4 p-0">
-                            <input type="text" name="" placeholder="Email (Separate emails with a comma)" class="w-100">
+                            <input type="text" name="sr_email" id="sr_email" placeholder="Email (Separate emails with a comma)" class="w-100">
                             <br>
                             <div class="float-left">
-                                <input type="checkbox" name="">Send Later
+                                <input type="checkbox" name="sr_send_later">Send Later
                             </div>
                             <div class="float-right">
                                 <p class="text-info">Cc/Bcc</p>
@@ -500,34 +510,34 @@
                         </div>
                         <div class="col-md-4 p-0 d-inline-flex center-content">
                             <h4 class="mr-2">BALANCE DUE: </h4>
-                            <h3 id="salesrbalance">PHP 0.00</h3>
+                            <h3 id="big_sales_receiptbalance">PHP 0.00</h3>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3">
                         <div class="col-md-4 p-0 pr-3">
                             <p>Billing Address</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="sr_bill_address" id="sr_bill_address" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Sales Receipt Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="sr_date" id="sr_date" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Payment Method</p>
-                            <input type="text" name="" placeholder="Choose payment method" class="w-100">
+                            <input type="text" name="sr_payment_method" id="sr_payment_method" placeholder="Choose payment method" class="w-100" required>
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Reference No.</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="sr_reference_no" id="sr_reference_no" class="w-100" required>
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Deposit to</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="sr_deposit_to" id="sr_deposit_to" class="w-100" required>
                         </div>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="sales_receipt_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -537,46 +547,19 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
                         <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button type="button" class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_sales_receipt">Add Lines</button>
+                                <button type="button" class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_sales_receipt">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="mb-0 pr-4 text-dark font-weight-bold">TOTAL</p>
-                                <p class="mb-0 text-dark font-weight-bold">PHP 1400.00</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 p-0">
-                        <div class="float-right mr-5">
-                            <div class="d-inline-flex mr-4">
-                                <p class="pr-4 text-dark font-weight-bold">Amount Received</p>
-                                <p class="text-dark font-weight-bold">PHP 500.00</p>
+                                <p class="mb-0 text-dark font-weight-bold" id="sales_receipttotal">PHP 0.00</p>
                             </div>
                         </div>
                     </div>
@@ -584,18 +567,26 @@
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="pr-4 text-dark font-weight-bold">BALANCE DUE</p>
-                                <p class="text-dark font-weight-bold">PHP 500.00</p>
+                                <p class="text-dark font-weight-bold" id="sales_receiptbalance">PHP 0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <div class="float-right mr-5">
+                            <div class="d-inline-flex mr-4">
+                                <p class="pr-4 text-dark font-weight-bold">Amount Received</p>
+                                <input type="number" name="sr_amount_paid" placeholder="0.00" required>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 pl-0">
                             <p>Message Displayed on Sales Receipt</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="sr_message" required></textarea>
                         </div>
                         <div class="col-md-6 pr-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="sr_memo" required></textarea>
                         </div>
                     </div>
                     <div class="col-md-6 m-0 p-0 mt-3">
@@ -605,7 +596,7 @@
                         </div>
                         <div class="input-group mb-3 p-0">
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                <input type="file" name="sr_attachment" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                 <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                             </div>
                         </div>
@@ -614,10 +605,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="salesradd" class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="salesradd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="creditnotemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
@@ -2746,23 +2738,6 @@
 <script>
     $(document).ready(function(){
     
-        $("#salesradd").click(function(){
-            
-            var salesrcustomer = $("#salesrcustomer").val();
-            var salesrbalance = $("#salesrbalance").text();
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>9/7/2018</td><td class='pt-3-half' contenteditable='true'>Sales Receipt</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+salesrcustomer+"</td><td class='pt-3-half' contenteditable='true'>9/6/2018</td><td class='pt-3-half' contenteditable='true'>"+salesrbalance+"</td><td class='pt-3-half' contenteditable='true'>"+salesrbalance+"</td><td class='pt-3-half' contenteditable='true'>Open</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true' data-target='#receivepaymentmodal'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#salestable").append(markup);
-    
-     });         
-    });    
-</script>
-<script>
-    $(document).ready(function(){
-    
         $("#creditnadd").click(function(){
             
             var creditncustomer = $("#creditncustomer").val();
@@ -3122,6 +3097,56 @@
         });
 
     }
+
+    function addSalesReceipt(){
+
+        $('#total_balance_sales_receipt').val($('#sales_receipttotal').text());
+
+        $(".sales_receipt_lines").each(function() {
+            $("#product_count_sales_receipt").val(parseInt($("#product_count_sales_receipt").val())+1);
+        });
+
+        var counter = 0;
+        var checker = 0;
+
+        $(".sales_receipt_lines").find('.sales_receipt_data').each(function() {
+            var id = $(this).attr("id");
+            var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+            
+            $(this).attr("name", name+counter);
+            
+            checker++;
+            if(checker%4==0){
+                counter++;
+            }
+        });
+
+
+        $.ajax({
+            method: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('add_sales_receipt') }}",
+            dataType: "text",
+            data: $('#add_sales_receipt_form').serialize(),
+            success: function (data) {
+                swal("Done!", "Added sales receipt", "success");
+                $("#product_count_sales_receipt").val('0');
+                checker = 0;
+                counter = 0;
+                $('#add_sales_receipt_form')[0].reset();
+                $('.sales_receipt_lines').remove();
+                
+                sales_table.ajax.reload();
+                sales_table_invoice.ajax.reload();
+            },
+            error: function (data) {
+                swal("Error!", "Sales receipt failed", "error");
+            }
+        });
+
+    }
     
 </script>
 
@@ -3251,6 +3276,9 @@
                     if(id == {{$customer->customer_id}}){
                         $('#invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
                         $('#big_invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#term').val('{{$customer->terms}}');
+                        $('#email').val('{{$customer->email}}');
                     }
             @endforeach
             }
@@ -3342,6 +3370,8 @@
                     if(id == {{$customer->customer_id}}){
                         $('#estimatebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
                         $('#big_estimatebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#e_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#e_email').val('{{$customer->email}}');
                     }
             @endforeach
             }
@@ -3395,6 +3425,101 @@
                 }
                 total_estimate += parseFloat(add_total);
                 $('#estimatetotal').html(total_estimate);
+            });
+        }   
+
+    
+        // ------------------------------------------------------------- SALES RECEIPT STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_sales_receipt', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_sales_receipt' + position).val('');
+                $('#select_product_rate_sales_receipt' + position).val('');
+                $('#total_amount_sales_receipt' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_sales_receipt' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_sales_receipt' + position).val(price);
+                        $('#total_amount_sales_receipt' + position).html(price * $('#product_qty_sales_receipt' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_sales_receipt();
+        });
+
+        $(document).on('change', '#salesrcustomer', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#sales_receiptbalance').html('PHP 0.00');
+                $('#big_sales_receiptbalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#sales_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_sales_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#sr_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#sr_payment_method').val('{{$customer->payment_method}}');
+                        $('#sr_email').val('{{$customer->email}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_sales_receipt', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_sales_receipt'  + position).html($('#select_product_rate_sales_receipt'  + position).val() * $('#product_qty_sales_receipt' + position).val());
+           
+            update_total_sales_receipt();
+        });
+
+
+        $("#add_lines_sales_receipt").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="sales_receipt_lines" id="sales_receipt_line'+$('#sales_receipt_table tr').length+'"><td class="pt-3-half" id="number_tag_sales_receipt" contenteditable="false">'+$('#sales_receipt_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="sales_receipt_data product_select_sales_receipt" id="select_product_name_sales_receipt'+$('#sales_receipt_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="sales_receipt_data" id="select_product_description_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="sales_receipt_data product_qty_sales_receipt" onclick="this.select();" id="product_qty_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="sales_receipt_data" id="select_product_rate_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_sales_receipt" id="total_amount_sales_receipt'+$('#sales_receipt_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_sales_receipt'+$('#sales_receipt_table tr').length+'" class="fa fa-trash delete_product_sales_receipt"></a></td></tr>';
+            
+            $("#sales_receipt_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_sales_receipt").click(function(event){
+            event.preventDefault();
+            $('.sales_receipt_lines').remove();
+
+            $('#sales_receipttotal').html('0.00');
+        }); 
+
+        $(document).on('click', '.delete_product_sales_receipt', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#sales_receipt_line'+position).remove();
+            
+            var tag_counter = 1;
+
+            $(".sales_receipt_lines").find('#number_tag_sales_receipt').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            update_sales_total_receipt();
+        }); 
+
+        function update_total_sales_receipt(){
+            var total_sales_receipt = 0;
+            $('.product_total_sales_receipt').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_sales_receipt += parseFloat(add_total);
+                $('#sales_receipttotal').html(total_sales_receipt);
             });
         }
 

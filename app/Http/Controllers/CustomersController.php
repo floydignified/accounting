@@ -7,6 +7,7 @@ use App\Customers;
 use App\SalesTransaction;
 use App\StInvoice;
 use App\StEstimate;
+use App\StSalesReceipt;
 use App\ProductsAndServices;
 
 class CustomersController extends Controller
@@ -112,7 +113,7 @@ class CustomersController extends Controller
         $sales_transaction->st_bill_address = null;
         $sales_transaction->st_note = null;
         $sales_transaction->st_memo = $request->p_memo;
-        $sales_transaction->st_i_attachment = $request->attachment;
+        $sales_transaction->st_i_attachment = $request->p_attachment;
         $sales_transaction->st_amount_paid = $request->p_amount;
         $sales_transaction->st_payment_for = $request->sales_transaction_number;
         $sales_transaction->save();
@@ -160,8 +161,6 @@ class CustomersController extends Controller
         $sales_transaction->st_balance = $request->total_balance_estimate;
         $sales_transaction->save();
 
-        $customer = new Customers;
-        $customer = Customers::find($request->customer);
 
         for($x=0;$x<$request->product_count_estimate;$x++){
             $st_estimate = new StEstimate;
@@ -175,6 +174,48 @@ class CustomersController extends Controller
             $st_estimate->st_p_reference_no = null;
             $st_estimate->st_p_deposit_to = null;
             $st_estimate->save();
+            
+        }
+    }
+
+    public function add_sales_receipt(Request $request)
+    {
+        $sales_number = SalesTransaction::count() + 1001;
+
+        $sales_transaction = new SalesTransaction;
+        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_date = $request->sr_date;
+        $sales_transaction->st_type = $request->transaction_type_sales_receipt;
+        $sales_transaction->st_term = null;
+        $sales_transaction->st_customer_id = $request->sr_customer;
+        $sales_transaction->st_due_date = null;
+        $sales_transaction->st_status = 'Closed';
+        $sales_transaction->st_action = '';
+        $sales_transaction->st_email = $request->sr_email;
+        $sales_transaction->st_send_later = $request->sr_send_later;
+        $sales_transaction->st_bill_address = $request->sr_bill_address;
+        $sales_transaction->st_note = $request->sr_note;
+        $sales_transaction->st_memo = $request->sr_memo;
+        $sales_transaction->st_i_attachment = $request->sr_attachment;
+        $sales_transaction->st_balance = 0;
+        $sales_transaction->save();
+
+        $customer = new Customers;
+        $customer = Customers::find($request->sr_customer);
+
+        for($x=0;$x<$request->product_count_sales_receipt;$x++){
+            $st_sales_receipt = new StSalesReceipt;
+            $st_sales_receipt->st_s_no = $sales_number;
+            $st_sales_receipt->st_s_product = $request->input('select_product_name_sales_receipt'.$x);
+            $st_sales_receipt->st_s_desc = $request->input('select_product_description_sales_receipt'.$x);
+            $st_sales_receipt->st_s_qty = $request->input('product_qty_sales_receipt'.$x);
+            $st_sales_receipt->st_s_rate = $request->input('select_product_rate_sales_receipt'.$x);
+            $st_sales_receipt->st_s_total = $request->input('product_qty_sales_receipt'.$x) * $request->input('select_product_rate_sales_receipt'.$x);
+            $st_sales_receipt->st_p_method = null;
+            $st_sales_receipt->st_p_reference_no = null;
+            $st_sales_receipt->st_p_deposit_to = null;
+            $st_sales_receipt->st_p_amount = $request->sr_amount_paid;
+            $st_sales_receipt->save();
 
         }
     }
@@ -227,6 +268,8 @@ class CustomersController extends Controller
                 return 'PHP '.number_format($sales_transaction->invoice_info->sum('st_i_total'), 2);  
             }else if($sales_transaction->st_type == "Estimate"){
                 return 'PHP '.number_format($sales_transaction->estimate_info->sum('st_e_total'), 2);  
+            }else if($sales_transaction->st_type == "Sales Receipt"){
+                return 'PHP '.number_format($sales_transaction->sales_receipt_info->sum('st_s_total'), 2);  
             }else{
                 return 'PHP '.number_format($sales_transaction->st_amount_paid, 2);  
             }           

@@ -41,5 +41,9 @@ class SalesTransaction extends Model
     public function estimate_info(){
 	    return $this->hasMany('App\StEstimate','st_e_no','st_no');
     }
+
+    public function sales_receipt_info(){
+	    return $this->hasMany('App\StSalesReceipt','st_s_no','st_no');
+    }
     
 }
