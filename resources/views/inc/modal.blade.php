@@ -135,6 +135,8 @@
     <input id="product_count" name="product_count" value="0" hidden>
     <input type="number" id="total_balance" name="total_balance" value="0" hidden>
     <input type="number" id="sales_transaction_number_estimate" name="sales_transaction_number_estimate" value="0" hidden>
+    <input type="number" id="sales_transaction_number_delayed_charge" name="sales_transaction_number_delayed_charge" value="0" hidden>
+    <input type="number" id="sales_transaction_number_delayed_credit" name="sales_transaction_number_delayed_credit" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -317,7 +319,16 @@
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Deposit to</p>
-                            <input type="text" name="p_deposit_to" class="w-100" required>
+                            <input type="text" list="payment_deposit" name="p_deposit_to" class="w-100" required>
+                            <datalist id="payment_deposit">
+                            <option>Cash and equivalents</option>
+                            <option>Allowance for bad debts</option>
+                            <option>Available for sale assets (short-term)</option>
+                            <option>Inventory</option>
+                            <option>Inventory asset</option>
+                            <option>Prepaid expenses</option>
+                            <option>Uncategorized assets</option>
+                            </datalist>
                         </div>
                         <div class="col-md-3 p-0">
                             <p>Amount Received</p>
@@ -534,7 +545,7 @@
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Deposit to</p>
-                            <input type="text" name="sr_deposit_to" id="sr_deposit_to" class="w-100" required>
+                            <input type="text" list="payment_deposit" name="sr_deposit_to" id="sr_deposit_to" class="w-100" required>
                         </div>
                     </div>
                     <table class="table table-bordered table-responsive-md table-striped text-left font14" id="sales_receipt_table">
@@ -737,6 +748,11 @@
     </div>
 </div>
 <div class="modal fade p-0" id="refundreceiptmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_refund_receipt_form" onsubmit="addRefundReceipt()">
+{{ csrf_field() }}
+    <input id="transaction_type_refund_receipt" name="transaction_type_refund_receipt" value="Refund Receipt" hidden>
+    <input type="number" id="total_balance_refund_receipt" name="total_balance_refund_receipt" value="0" hidden>
+    <input id="product_count_refund_receipt" name="product_count_refund_receipt" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -749,13 +765,18 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-4 p-0 pr-3">
-                            <input type="text" name="" placeholder="Choose a customer" class="w-100">
+                            <select id="refundrcustomer" type="text" name="rr_customer" class="w-100" required>
+                                <option value=""></option>
+                                @foreach($customers as $customer)
+                                <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-4 p-0">
-                            <input type="text" name="" placeholder="Email (Separate emails with a comma)" class="w-100">
+                            <input type="text" name="rr_email" id="rr_email" placeholder="Email (Separate emails with a comma)" class="w-100">
                             <br>
                             <div class="float-left">
-                                <input type="checkbox" name="">Send Later
+                                <input type="checkbox" name="rr_send_later">Send Later
                             </div>
                             <div class="float-right">
                                 <p class="text-info">Cc/Bcc</p>
@@ -763,30 +784,30 @@
                         </div>
                         <div class="col-md-4 p-0 d-inline-flex center-content">
                             <h4 class="mr-2">BALANCE DUE: </h4>
-                            <h3>PHP 0.00</h3>
+                            <h3 id="big_refund_receiptbalance">PHP 0.00</h3>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3">
                         <div class="col-md-4 p-0 pr-3">
                             <p>Billing Address</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="rr_bill_address" id="rr_bill_address" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Refund Receipt Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="rr_date" id="rr_date" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Payment Method</p>
-                            <input type="text" name="" placeholder="Choose payment method" class="w-100">
+                            <input type="text" name="rr_payment_method" id="rr_payment_method" placeholder="Choose payment method" class="w-100" required>
                         </div>
                         <div class="col-md-3 p-0 pr-3">
-                            <p>Refund From</p>
-                            <input type="text" name="" class="w-100" placeholder="Choose an account">
+                            <p>Refund from</p>
+                            <input type="text" list="payment_deposit" name="rr_deposit_to" id="rr_deposit_to" class="w-100" required>
                         </div>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="refund_receipt_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -796,57 +817,47 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
                         <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button type="button" class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_refund_receipt">Add Lines</button>
+                                <button type="button" class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_refund_receipt">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="mb-0 pr-4 text-dark font-weight-bold">TOTAL</p>
-                                <p class="mb-0 text-dark font-weight-bold">PHP 1400.00</p>
+                                <p class="mb-0 text-dark font-weight-bold" id="refund_receipttotal">PHP 0.00</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 p-0">
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
-                                <p class="pr-4 text-dark font-weight-bold">TOTAL AMOUNT REFUNDED</p>
-                                <p class="text-dark font-weight-bold">PHP 500.00</p>
+                                <p class="pr-4 text-dark font-weight-bold">BALANCE DUE</p>
+                                <p class="text-dark font-weight-bold" id="refund_receiptbalance">PHP 0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <div class="float-right mr-5">
+                            <div class="d-inline-flex mr-4">
+                                <p class="pr-4 text-dark font-weight-bold">Total Amount Refunded</p>
+                                <p class="mb-0 text-dark font-weight-bold" id="refund_receipttotal1">PHP 0.00</p>
+                                <input type="number" id="rr_amount_refunded" name="rr_amount_refunded" placeholder="0.00" hidden>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 pl-0">
                             <p>Message Displayed on Refund Receipt</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="rr_message" required></textarea>
                         </div>
                         <div class="col-md-6 pr-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="rr_memo" required></textarea>
                         </div>
                     </div>
                     <div class="col-md-6 m-0 p-0 mt-3">
@@ -856,7 +867,7 @@
                         </div>
                         <div class="input-group mb-3 p-0">
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                <input type="file" name="rr_attachment" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                 <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                             </div>
                         </div>
@@ -865,12 +876,17 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="refundradd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="delayedcreditmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_delayed_credit_form" onsubmit="addDelayedCredit()">
+{{ csrf_field() }}
+<input id="transaction_type_delayed_credit" name="transaction_type_delayed_credit" value="Credit" hidden>
+<input id="product_count_delayed_credit" name="product_count_delayed_credit" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -883,22 +899,27 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-4 p-0 pr-3">
-                            <input type="text" name="" placeholder="Choose a customer" class="w-100">
+                            <select id="delayedcreditcustomer" type="text" name="dcredit_customer" class="w-100" required>
+                            <option value=""></option>
+                            @foreach($customers as $customer)
+                            <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                            @endforeach
+                            </select>
                         </div>
                         <div class="col-md-4 p-0">
                         </div>
                         <div class="col-md-4 p-0 d-inline-flex center-content">
                             <h4 class="mr-2">BALANCE DUE: </h4>
-                            <h3>PHP 0.00</h3>
+                            <h3 id="delayed_creditbalance">PHP 0.00</h3>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Delayed Credit Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="dcredit_date" class="w-100">
                         </div>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="delayed_credit_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -908,45 +929,26 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
                         <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_delayed_credit">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_delayed_credit">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="mb-0 pr-4 text-dark font-weight-bold">TOTAL</p>
-                                <p class="mb-0 text-dark font-weight-bold">PHP 1400.00</p>
+                                <p class="mb-0 text-dark font-weight-bold" id="delayed_credittotal">PHP 0.00</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="dcredit_memo"></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0">
                             <div class="d-inline-flex">
@@ -955,7 +957,7 @@
                             </div>
                             <div class="input-group mb-3 p-0">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <input type="file" class="custom-file-input" name="dcredit_attachment" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                     <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                                 </div>
                             </div>
@@ -965,12 +967,17 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="creditnadd" class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="delayedcreditadd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="delayedchargemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_delayed_charge_form" onsubmit="addDelayedCharge()">
+{{ csrf_field() }}
+<input id="transaction_type_delayed_charge" name="transaction_type_delayed_charge" value="Charge" hidden>
+<input id="product_count_delayed_charge" name="product_count_delayed_charge" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -983,22 +990,27 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-4 p-0 pr-3">
-                            <input id="delayedccustomer" type="text" name="" placeholder="Choose a customer" class="w-100">
+                            <select id="delayedccustomer" type="text" name="dc_customer" class="w-100" required>
+                            <option value=""></option>
+                            @foreach($customers as $customer)
+                            <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                            @endforeach
+                            </select>
                         </div>
                         <div class="col-md-4 p-0">
                         </div>
                         <div class="col-md-4 p-0 d-inline-flex center-content">
                             <h4 class="mr-2">BALANCE DUE: </h4>
-                            <h3 id="delayedcbalance">PHP 0.00</h3>
+                            <h3 id="delayed_chargebalance">PHP 0.00</h3>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Delayed Charge Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="dc_date" class="w-100">
                         </div>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="delayed_charge_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -1008,45 +1020,26 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
                         <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_delayed_charge">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_delayed_charge">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="mb-0 pr-4 text-dark font-weight-bold">TOTAL</p>
-                                <p class="mb-0 text-dark font-weight-bold">PHP 1400.00</p>
+                                <p class="mb-0 text-dark font-weight-bold" id="delayed_chargetotal">PHP 0.00</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="dc_memo"></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0">
                             <div class="d-inline-flex">
@@ -1055,7 +1048,7 @@
                             </div>
                             <div class="input-group mb-3 p-0">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <input type="file" class="custom-file-input" name="dc_attachment" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                     <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                                 </div>
                             </div>
@@ -1065,10 +1058,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="delayadcadd" class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="delayedcadd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="expensemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
@@ -2752,40 +2746,6 @@
      });         
     });    
 </script>
-<script>
-    $(document).ready(function(){
-    
-        $("#delayadcadd").click(function(){
-            
-            var delayedccustomer = $("#delayedccustomer").val();
-            var delayedcbalance = $("#delayedcbalance").text();
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>9/7/2018</td><td class='pt-3-half' contenteditable='true'>Delayed Charge</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+delayedccustomer+"</td><td class='pt-3-half' contenteditable='true'>9/6/2018</td><td class='pt-3-half' contenteditable='true'>"+delayedcbalance+"</td><td class='pt-3-half' contenteditable='true'>"+delayedcbalance+"</td><td class='pt-3-half' contenteditable='true'>Open</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true' data-target='#receivepaymentmodal'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#salestable").append(markup);
-    
-     });         
-    });    
-</script>
-<script>
-    $(document).ready(function(){
-    
-        $("#delayadcadd").click(function(){
-            
-            var delayedccustomer = $("#delayedccustomer").val();
-            var delayedcbalance = $("#delayedcbalance").text();
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>9/7/2018</td><td class='pt-3-half' contenteditable='true'>Delayed Charge</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+delayedccustomer+"</td><td class='pt-3-half' contenteditable='true'>9/6/2018</td><td class='pt-3-half' contenteditable='true'>"+delayedcbalance+"</td><td class='pt-3-half' contenteditable='true'>"+delayedcbalance+"</td><td class='pt-3-half' contenteditable='true'>Open</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true' data-target='#receivepaymentmodal'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#salestable").append(markup);
-    
-     });         
-    });    
-</script>
 
 <script>
     var sales_table;
@@ -3014,7 +2974,7 @@
                 $('#add_invoice_form')[0].reset();
                 $('.invoice_lines').remove();
                 $('#sales_transaction_number_estimate').val('0');
-
+                $('#sales_transaction_number_delayed_charge').val('0');
                 sales_table.ajax.reload();
                 sales_table_invoice.ajax.reload();
             },
@@ -3145,6 +3105,156 @@
                 swal("Error!", "Sales receipt failed", "error");
             }
         });
+
+    }
+
+    function addRefundReceipt(){
+
+        $('#total_balance_refund_receipt').val($('#refund_receipttotal').text());
+
+        $(".refund_receipt_lines").each(function() {
+            $("#product_count_refund_receipt").val(parseInt($("#product_count_refund_receipt").val())+1);
+        });
+
+        var counter = 0;
+        var checker = 0;
+
+        $(".refund_receipt_lines").find('.refund_receipt_data').each(function() {
+            var id = $(this).attr("id");
+            var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+            
+            $(this).attr("name", name+counter);
+            
+            checker++;
+            if(checker%4==0){
+                counter++;
+            }
+        });
+
+
+        $.ajax({
+            method: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('add_refund_receipt') }}",
+            dataType: "text",
+            data: $('#add_refund_receipt_form').serialize(),
+            success: function (data) {
+                swal("Done!", "Added refund receipt", "success");
+                $("#product_count_refund_receipt").val('0');
+                checker = 0;
+                counter = 0;
+                $('#add_refund_receipt_form')[0].reset();
+                $('.refund_receipt_lines').remove();
+                
+                sales_table.ajax.reload();
+                sales_table_invoice.ajax.reload();
+            },
+            error: function (data) {
+                swal("Error!", "Refund receipt failed", "error");
+            }
+        });
+
+        }
+
+    function addDelayedCharge(){
+
+        $('#total_balance_delayed_charge').val($('#delayed_chargetotal').text());
+
+        $(".delayed_charge_lines").each(function() {
+            $("#product_count_delayed_charge").val(parseInt($("#product_count_delayed_charge").val())+1);
+        });
+
+        var counter = 0;
+        var checker = 0;
+
+        $(".delayed_charge_lines").find('.delayed_charge_data').each(function() {
+            var id = $(this).attr("id");
+            var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+            
+            $(this).attr("name", name+counter);
+            
+            checker++;
+            if(checker%4==0){
+                counter++;
+            }
+        });
+
+
+        $.ajax({
+            method: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('add_delayed_charge') }}",
+            dataType: "text",
+            data: $('#add_delayed_charge_form').serialize(),
+            success: function (data) {
+                swal("Done!", "Added delayed charge", "success");
+                $("#product_count_delayed_charge").val('0');
+                checker = 0;
+                counter = 0;
+                $('#add_delayed_charge_form')[0].reset();
+                $('.delayed_charge_lines').remove();
+                
+                sales_table.ajax.reload();
+                sales_table_invoice.ajax.reload();
+            },
+            error: function (data) {
+                swal("Error!", "Delayed charge failed", "error");
+            }
+        });
+
+    }
+
+    function addDelayedCredit(){
+
+    $('#total_balance_delayed_credit').val($('#delayed_credittotal').text());
+
+    $(".delayed_credit_lines").each(function() {
+        $("#product_count_delayed_credit").val(parseInt($("#product_count_delayed_credit").val())+1);
+    });
+
+    var counter = 0;
+    var checker = 0;
+
+    $(".delayed_credit_lines").find('.delayed_credit_data').each(function() {
+        var id = $(this).attr("id");
+        var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+        
+        $(this).attr("name", name+counter);
+        
+        checker++;
+        if(checker%4==0){
+            counter++;
+        }
+    });
+
+
+    $.ajax({
+        method: "POST",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "{{ route('add_delayed_credit') }}",
+        dataType: "text",
+        data: $('#add_delayed_credit_form').serialize(),
+        success: function (data) {
+            swal("Done!", "Added delayed credit", "success");
+            $("#product_count_delayed_credit").val('0');
+            checker = 0;
+            counter = 0;
+            $('#add_delayed_credit_form')[0].reset();
+            $('.delayed_credit_lines').remove();
+            
+            sales_table.ajax.reload();
+            sales_table_invoice.ajax.reload();
+        },
+        error: function (data) {
+            swal("Error!", "Delayed credit failed", "error");
+        }
+    });
 
     }
     
@@ -3290,11 +3400,18 @@
            
             update_total();
         });
+
+        $(document).on('change', '.invoice_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount'  + position).html($('#select_product_rate'  + position).val() * $('#product_qty' + position).val());
+           
+            update_total();
+        });
         
 
         $("#add_lines_invoice").click(function(event){
             event.preventDefault();
-            var markup = '<tr class="invoice_lines" id="invoice_line'+$('#invoice_table tr').length+'"><td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="invoice_data product_select" id="select_product_name'+$('#invoice_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="invoice_data" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="invoice_data" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';
+            var markup = '<tr class="invoice_lines" id="invoice_line'+$('#invoice_table tr').length+'"><td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="invoice_data product_select" id="select_product_name'+$('#invoice_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="invoice_data product_description" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="invoice_data product_rate" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';
             
             $("#invoice_table").append(markup);
 
@@ -3313,11 +3430,53 @@
             var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
             $('#invoice_line'+position).remove();
             
+            var line_counter = 1;
+            var delete_counter = 1;
             var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".invoice_lines").each(function() {
+                $(this).attr("id","invoice_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product").each(function() {
+                $(this).attr("id","delete_product"+delete_counter);
+                delete_counter++;
+            });
 
             $(".invoice_lines").find('#number_tag').each(function() {
                 $(this).html(tag_counter);
                 tag_counter++;
+            });
+
+            $('.product_select').each(function() {
+                $(this).attr("id","select_product_name"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description').each(function() {
+                $(this).attr("id","select_product_description"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty').each(function() {
+                $(this).attr("id","product_qty"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate').each(function() {
+                $(this).attr("id","select_product_rate"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total").each(function() {
+                $(this).attr("id","total_amount"+total_id_counter);
+                total_id_counter++;
             });
 
             update_total();
@@ -3384,10 +3543,17 @@
             update_total_estimate();
         });
 
+        $(document).on('change', '.estimate_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_estimate'  + position).html($('#select_product_rate_estimate'  + position).val() * $('#product_qty_estimate' + position).val());
+           
+            update_total_estimate();
+        });
+
 
         $("#add_lines_estimate").click(function(event){
             event.preventDefault();
-            var markup = '<tr class="estimate_lines" id="estimate_line'+$('#estimate_table tr').length+'"><td class="pt-3-half" id="number_tag_estimate" contenteditable="false">'+$('#estimate_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="estimate_data product_select_estimate" id="select_product_name_estimate'+$('#estimate_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="estimate_data" id="select_product_description_estimate'+$('#estimate_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="estimate_data product_qty_estimate" onclick="this.select();" id="product_qty_estimate'+$('#estimate_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="estimate_data" id="select_product_rate_estimate'+$('#estimate_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_estimate" id="total_amount_estimate'+$('#estimate_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_estimate'+$('#estimate_table tr').length+'" class="fa fa-trash delete_product_estimate"></a></td></tr>';
+            var markup = '<tr class="estimate_lines" id="estimate_line'+$('#estimate_table tr').length+'"><td class="pt-3-half" id="number_tag_estimate" contenteditable="false">'+$('#estimate_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="estimate_data product_select_estimate" id="select_product_name_estimate'+$('#estimate_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="estimate_data product_description_estimate" id="select_product_description_estimate'+$('#estimate_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="estimate_data product_qty_estimate" onclick="this.select();" id="product_qty_estimate'+$('#estimate_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="estimate_data product_rate_estimate" id="select_product_rate_estimate'+$('#estimate_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_estimate" id="total_amount_estimate'+$('#estimate_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_estimate'+$('#estimate_table tr').length+'" class="fa fa-trash delete_product_estimate"></a></td></tr>';
             
             $("#estimate_table").append(markup);
 
@@ -3406,14 +3572,57 @@
             var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
             $('#estimate_line'+position).remove();
             
+            var line_counter = 1;
+            var delete_counter = 1;
             var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".estimate_lines").each(function() {
+                $(this).attr("id","estimate_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_estimate").each(function() {
+                $(this).attr("id","delete_product_estimate"+delete_counter);
+                delete_counter++;
+            });
 
             $(".estimate_lines").find('#number_tag_estimate').each(function() {
                 $(this).html(tag_counter);
                 tag_counter++;
             });
 
+            $('.product_select_estimate').each(function() {
+                $(this).attr("id","select_product_name_estimate"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_estimate').each(function() {
+                $(this).attr("id","select_product_description_estimate"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_estimate').each(function() {
+                $(this).attr("id","product_qty_estimate"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_estimate').each(function() {
+                $(this).attr("id","select_product_rate_estimate"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_estimate").each(function() {
+                $(this).attr("id","total_amount_estimate"+total_id_counter);
+                total_id_counter++;
+            });
+
             update_total_estimate();
+            
         }); 
 
         function update_total_estimate(){
@@ -3479,10 +3688,17 @@
             update_total_sales_receipt();
         });
 
+        $(document).on('change', '.sales_receipt_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_sales_receipt'  + position).html($('#select_product_rate_sales_receipt'  + position).val() * $('#product_qty_sales_receipt' + position).val());
+           
+            update_total_sales_receipt();
+        });
+
 
         $("#add_lines_sales_receipt").click(function(event){
             event.preventDefault();
-            var markup = '<tr class="sales_receipt_lines" id="sales_receipt_line'+$('#sales_receipt_table tr').length+'"><td class="pt-3-half" id="number_tag_sales_receipt" contenteditable="false">'+$('#sales_receipt_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="sales_receipt_data product_select_sales_receipt" id="select_product_name_sales_receipt'+$('#sales_receipt_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="sales_receipt_data" id="select_product_description_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="sales_receipt_data product_qty_sales_receipt" onclick="this.select();" id="product_qty_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="sales_receipt_data" id="select_product_rate_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_sales_receipt" id="total_amount_sales_receipt'+$('#sales_receipt_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_sales_receipt'+$('#sales_receipt_table tr').length+'" class="fa fa-trash delete_product_sales_receipt"></a></td></tr>';
+            var markup = '<tr class="sales_receipt_lines" id="sales_receipt_line'+$('#sales_receipt_table tr').length+'"><td class="pt-3-half" id="number_tag_sales_receipt" contenteditable="false">'+$('#sales_receipt_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="sales_receipt_data product_select_sales_receipt" id="select_product_name_sales_receipt'+$('#sales_receipt_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="sales_receipt_data product_description_sales_receipt" id="select_product_description_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="sales_receipt_data product_qty_sales_receipt" onclick="this.select();" id="product_qty_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="sales_receipt_data product_rate_sales_receipt" id="select_product_rate_sales_receipt'+$('#sales_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_sales_receipt" id="total_amount_sales_receipt'+$('#sales_receipt_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_sales_receipt'+$('#sales_receipt_table tr').length+'" class="fa fa-trash delete_product_sales_receipt"></a></td></tr>';
             
             $("#sales_receipt_table").append(markup);
 
@@ -3501,14 +3717,56 @@
             var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
             $('#sales_receipt_line'+position).remove();
             
+            var line_counter = 1;
+            var delete_counter = 1;
             var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".sales_receipt_lines").each(function() {
+                $(this).attr("id","sales_receipt_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_sales_receipt").each(function() {
+                $(this).attr("id","delete_product_sales_receipt"+delete_counter);
+                delete_counter++;
+            });
 
             $(".sales_receipt_lines").find('#number_tag_sales_receipt').each(function() {
                 $(this).html(tag_counter);
                 tag_counter++;
             });
 
-            update_sales_total_receipt();
+            $('.product_select_sales_receipt').each(function() {
+                $(this).attr("id","select_product_name_sales_receipt"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_sales_receipt').each(function() {
+                $(this).attr("id","select_product_description_sales_receipt"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_sales_receipt').each(function() {
+                $(this).attr("id","product_qty_sales_receipt"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_sales_receipt').each(function() {
+                $(this).attr("id","select_product_rate_sales_receipt"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_sales_receipt").each(function() {
+                $(this).attr("id","total_amount_sales_receipt"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_sales_receipt();
         }); 
 
         function update_total_sales_receipt(){
@@ -3520,6 +3778,433 @@
                 }
                 total_sales_receipt += parseFloat(add_total);
                 $('#sales_receipttotal').html(total_sales_receipt);
+            });
+        }
+
+        // ------------------------------------------------------------- REFUND RECEIPT STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_refund_receipt', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_refund_receipt' + position).val('');
+                $('#select_product_rate_refund_receipt' + position).val('');
+                $('#total_amount_refund_receipt' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_refund_receipt' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_refund_receipt' + position).val(price);
+                        $('#total_amount_refund_receipt' + position).html(price * $('#product_qty_refund_receipt' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_refund_receipt();
+        });
+
+        $(document).on('change', '#refundrcustomer', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#refund_receiptbalance').html('PHP 0.00');
+                $('#big_refund_receiptbalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#refund_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_refund_receiptbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#rr_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#rr_payment_method').val('{{$customer->payment_method}}');
+                        $('#rr_email').val('{{$customer->email}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_refund_receipt', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_refund_receipt'  + position).html($('#select_product_rate_refund_receipt'  + position).val() * $('#product_qty_refund_receipt' + position).val());
+           
+            update_total_refund_receipt();
+        });
+
+        $(document).on('change', '.refund_receipt_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_refund_receipt'  + position).html($('#select_product_rate_refund_receipt'  + position).val() * $('#product_qty_refund_receipt' + position).val());
+           
+            update_total_refund_receipt();
+        });
+
+
+        $("#add_lines_refund_receipt").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="refund_receipt_lines" id="refund_receipt_line'+$('#refund_receipt_table tr').length+'"><td class="pt-3-half" id="number_tag_refund_receipt" contenteditable="false">'+$('#refund_receipt_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="refund_receipt_data product_select_refund_receipt" id="select_product_name_refund_receipt'+$('#refund_receipt_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="refund_receipt_data product_description_refund_receipt" id="select_product_description_refund_receipt'+$('#refund_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="refund_receipt_data product_qty_refund_receipt" onclick="this.select();" id="product_qty_refund_receipt'+$('#refund_receipt_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="refund_receipt_data product_rate_refund_receipt" id="select_product_rate_refund_receipt'+$('#refund_receipt_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_refund_receipt" id="total_amount_refund_receipt'+$('#refund_receipt_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_refund_receipt'+$('#refund_receipt_table tr').length+'" class="fa fa-trash delete_product_refund_receipt"></a></td></tr>';
+            
+            $("#refund_receipt_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_refund_receipt").click(function(event){
+            event.preventDefault();
+            $('.refund_receipt_lines').remove();
+
+            $('#refund_receipttotal').html('0.00');
+            $('#refund_receipttotal1').html('0.00');
+            $('#rr_amount_refunded').val('0.00');
+        }); 
+
+        $(document).on('click', '.delete_product_refund_receipt', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#refund_receipt_line'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".refund_receipt_lines").each(function() {
+                $(this).attr("id","refund_receipt_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_refund_receipt").each(function() {
+                $(this).attr("id","delete_product_refund_receipt"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".refund_receipt_lines").find('#number_tag_refund_receipt').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_refund_receipt').each(function() {
+                $(this).attr("id","select_product_name_refund_receipt"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_refund_receipt').each(function() {
+                $(this).attr("id","select_product_description_refund_receipt"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_refund_receipt').each(function() {
+                $(this).attr("id","product_qty_refund_receipt"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_refund_receipt').each(function() {
+                $(this).attr("id","select_product_rate_refund_receipt"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_refund_receipt").each(function() {
+                $(this).attr("id","total_amount_refund_receipt"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_refund_receipt();
+        }); 
+
+        function update_total_refund_receipt(){
+            var total_refund_receipt = 0;
+            $('.product_total_refund_receipt').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_refund_receipt += parseFloat(add_total);
+                $('#refund_receipttotal').html(total_refund_receipt);
+                $('#refund_receipttotal1').html(total_refund_receipt);
+                $('#rr_amount_refunded').val('0.00');
+            });
+        }
+
+        // ------------------------------------------------------------- DELAYED CHARGE STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_delayed_charge', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_delayed_charge' + position).val('');
+                $('#select_product_rate_delayed_charge' + position).val('');
+                $('#total_amount_delayed_charge' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_delayed_charge' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_delayed_charge' + position).val(price);
+                        $('#total_amount_delayed_charge' + position).html(price * $('#product_qty_delayed_charge' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_delayed_charge();
+        });
+
+        $(document).on('change', '#delayedccustomer', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#delayed_chargebalance').html('PHP 0.00');
+                $('#big_delayed_chargebalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#delayed_chargebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_delayed_chargebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_delayed_charge', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_delayed_charge'  + position).html($('#select_product_rate_delayed_charge'  + position).val() * $('#product_qty_delayed_charge' + position).val());
+           
+            update_total_delayed_charge();
+        });
+
+        $(document).on('change', '.delayed_charge_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_delayed_charge'  + position).html($('#select_product_rate_delayed_charge'  + position).val() * $('#product_qty_delayed_charge' + position).val());
+           
+            update_total_delayed_charge();
+        });
+
+
+        $("#add_lines_delayed_charge").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="delayed_charge_lines" id="delayed_charge_line'+$('#delayed_charge_table tr').length+'"><td class="pt-3-half" id="number_tag_delayed_charge" contenteditable="false">'+$('#delayed_charge_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="delayed_charge_data product_select_delayed_charge" id="select_product_name_delayed_charge'+$('#delayed_charge_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="delayed_charge_data product_description_delayed_charge" id="select_product_description_delayed_charge'+$('#delayed_charge_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="delayed_charge_data product_qty_delayed_charge" onclick="this.select();" id="product_qty_delayed_charge'+$('#delayed_charge_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="delayed_charge_data product_rate_delayed_charge" id="select_product_rate_delayed_charge'+$('#delayed_charge_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_delayed_charge" id="total_amount_delayed_charge'+$('#delayed_charge_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_delayed_charge'+$('#delayed_charge_table tr').length+'" class="fa fa-trash delete_product_delayed_charge"></a></td></tr>';
+            
+            $("#delayed_charge_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_delayed_charge").click(function(event){
+            event.preventDefault();
+            $('.delayed_charge_lines').remove();
+
+            $('#delayed_chargetotal').html('0.00');
+        }); 
+
+        $(document).on('click', '.delete_product_delayed_charge', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#delayed_charge_line'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".delayed_charge_lines").each(function() {
+                $(this).attr("id","delayed_charge_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_delayed_charge").each(function() {
+                $(this).attr("id","delete_product_delayed_charge"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".delayed_charge_lines").find('#number_tag_delayed_charge').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_delayed_charge').each(function() {
+                $(this).attr("id","select_product_name_delayed_charge"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_delayed_charge').each(function() {
+                $(this).attr("id","select_product_description_delayed_charge"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_delayed_charge').each(function() {
+                $(this).attr("id","product_qty_delayed_charge"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_delayed_charge').each(function() {
+                $(this).attr("id","select_product_rate_delayed_charge"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_delayed_charge").each(function() {
+                $(this).attr("id","total_amount_delayed_charge"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_delayed_charge();
+        }); 
+
+        function update_total_delayed_charge(){
+            var total_delayed_charge = 0;
+            $('.product_total_delayed_charge').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_delayed_charge += parseFloat(add_total);
+                $('#delayed_chargetotal').html(total_delayed_charge);
+            });
+        }
+
+        // ------------------------------------------------------------- DELAYED CREDIT STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_delayed_credit', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_delayed_credit' + position).val('');
+                $('#select_product_rate_delayed_credit' + position).val('');
+                $('#total_amount_delayed_credit' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_delayed_credit' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_delayed_credit' + position).val(price);
+                        $('#total_amount_delayed_credit' + position).html(price * $('#product_qty_delayed_credit' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_delayed_credit();
+        });
+
+        $(document).on('change', '#delayedcreditcustomer', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#delayed_creditbalance').html('PHP 0.00');
+                $('#big_delayed_creditbalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#delayed_creditbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_delayed_creditbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_delayed_credit', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_delayed_credit'  + position).html($('#select_product_rate_delayed_credit'  + position).val() * $('#product_qty_delayed_credit' + position).val());
+           
+            update_total_delayed_credit();
+        });
+
+        $(document).on('change', '.delayed_credit_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_delayed_credit'  + position).html($('#select_product_rate_delayed_credit'  + position).val() * $('#product_qty_delayed_credit' + position).val());
+           
+            update_total_delayed_credit();
+        });
+
+
+        $("#add_lines_delayed_credit").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="delayed_credit_lines" id="delayed_credit_line'+$('#delayed_credit_table tr').length+'"><td class="pt-3-half" id="number_tag_delayed_credit" contenteditable="false">'+$('#delayed_credit_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="delayed_credit_data product_select_delayed_credit" id="select_product_name_delayed_credit'+$('#delayed_credit_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="delayed_credit_data product_description_delayed_credit" id="select_product_description_delayed_credit'+$('#delayed_credit_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="delayed_credit_data product_qty_delayed_credit" onclick="this.select();" id="product_qty_delayed_credit'+$('#delayed_credit_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="delayed_credit_data product_rate_delayed_credit" id="select_product_rate_delayed_credit'+$('#delayed_credit_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_delayed_credit" id="total_amount_delayed_credit'+$('#delayed_credit_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_delayed_credit'+$('#delayed_credit_table tr').length+'" class="fa fa-trash delete_product_delayed_credit"></a></td></tr>';
+            
+            $("#delayed_credit_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_delayed_credit").click(function(event){
+            event.preventDefault();
+            $('.delayed_credit_lines').remove();
+
+            $('#delayed_credittotal').html('0.00');
+        }); 
+
+        $(document).on('click', '.delete_product_delayed_credit', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#delayed_credit_line'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".delayed_credit_lines").each(function() {
+                $(this).attr("id","delayed_credit_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_delayed_credit").each(function() {
+                $(this).attr("id","delete_product_delayed_credit"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".delayed_credit_lines").find('#number_tag_delayed_credit').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_delayed_credit').each(function() {
+                $(this).attr("id","select_product_name_delayed_credit"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_delayed_credit').each(function() {
+                $(this).attr("id","select_product_description_delayed_credit"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_delayed_credit').each(function() {
+                $(this).attr("id","product_qty_delayed_credit"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_delayed_credit').each(function() {
+                $(this).attr("id","select_product_rate_delayed_credit"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_delayed_credit").each(function() {
+                $(this).attr("id","total_amount_delayed_credit"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_delayed_credit();
+        }); 
+
+        function update_total_delayed_credit(){
+            var total_delayed_credit = 0;
+            $('.product_total_delayed_credit').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_delayed_credit += parseFloat(add_total);
+                $('#delayed_credittotal').html(total_delayed_credit);
             });
         }
 

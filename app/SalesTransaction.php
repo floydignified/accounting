@@ -45,5 +45,17 @@ class SalesTransaction extends Model
     public function sales_receipt_info(){
 	    return $this->hasMany('App\StSalesReceipt','st_s_no','st_no');
     }
+
+    public function refund_receipt_info(){
+	    return $this->hasMany('App\StRefundReceipt','st_r_no','st_no');
+    }
+
+    public function delayed_charge_info(){
+	    return $this->hasMany('App\StDelayedCharge','st_dc_no','st_no');
+    }
+
+    public function delayed_credit_info(){
+	    return $this->hasMany('App\StDelayedCredit','st_dcredit_no','st_no');
+    }
     
 }

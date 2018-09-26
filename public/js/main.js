@@ -372,4 +372,22 @@ jQuery(document).ready(function($) {
 		$('#salesreceiptmodal').modal('hide');
 	});
 
+	$("#add_refund_receipt_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#refundreceiptmodal').modal('hide');
+	});
+
+	$("#add_delayed_charge_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#delayedchargemodal').modal('hide');
+	});
+
+	$("#add_delayed_credit_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#delayedcreditmodal').modal('hide');
+	});
+
 });

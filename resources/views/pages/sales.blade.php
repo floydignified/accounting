@@ -1001,6 +1001,31 @@
         </div>
 
 <script>
+
+function number_format(number, decimals, dec_point, thousands_sep) {
+    // Strip all characters but numerical ones.
+    number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+    var n = !isFinite(+number) ? 0 : +number,
+        prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+        sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+        dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+        s = '',
+        toFixedFix = function (n, prec) {
+            var k = Math.pow(10, prec);
+            return '' + Math.round(n * k) / k;
+        };
+    // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+    if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+    }
+    if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+    }
+    return s.join(dec);
+}
+
 $(document).ready(function(){
 
     var total_invoice_count = 0;
@@ -1043,7 +1068,7 @@ $(document).ready(function(){
                 @foreach($customers as $customer)
                     if({{$customer->customer_id}} == customer_transaction){
                         $('#paymentcustomer').val('{{$customer->display_name}}');
-                        $('#paymentbalance').text('PHP {{ number_format($customer->opening_balance,2) }}');
+                        $('#paymentbalance').text('PHP ' + number_format(data.st_balance,2));
                         $('#payment_customer_id').val('{{$customer->customer_id}}');
                         $('#p_payment_method').val('{{$customer->payment_method}}');
                     }
@@ -1055,7 +1080,7 @@ $(document).ready(function(){
         });
     });
 
-    $(document).on('click', '.create_invoice', function(){
+    $(document).on('click', '.create_invoice_estimate', function(){
         var id = $(this).attr('id');
         
         $.ajax({
@@ -1096,6 +1121,146 @@ $(document).ready(function(){
                                 console.log(data)
                                 for($x=0;$x<data.length;$x++){
                                     var markup = '<tr class="invoice_lines" id="invoice_line'+$('#invoice_table tr').length+'"><td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="invoice_data product_select" id="select_product_name'+$('#invoice_table tr').length+'"><option value="'+data[$x].st_e_product+'">'+data[$x].st_e_product_name+'</option></select></td><td class="pt-3-half"><input class="invoice_data" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_e_desc+'"></td><td class="pt-3-half"><input type="number" class="invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" value="'+data[$x].st_e_qty+'"></td><td class="pt-3-half"><input class="invoice_data" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_e_rate+'"></td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'">'+data[$x].st_e_total+'</td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';
+            
+                                    $("#invoice_table").append(markup);
+                                }
+
+                                var total_invoice = 0;
+                                $('.product_total').each(function() {
+                                    var add_total = $(this).html();
+                                    if(add_total==""){
+                                        add_total=0;
+                                    }
+                                    total_invoice += parseFloat(add_total);
+                                    $('#invoicetotal').html(total_invoice);
+                                });
+                            },
+                            error: function (data) {
+                                swal("Error!", "Transaction failed", "error");
+                            }
+                        });
+
+                        
+                    }
+                 @endforeach
+            },
+            error: function (data) {
+                swal("Error!", "Transaction failed", "error");
+            }
+        });
+    });
+
+    $(document).on('click', '.create_invoice_delayed_charge', function(){
+        var id = $(this).attr('id');
+        
+        $.ajax({
+            method: "GET",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('get_all_transactions') }}",
+            dataType: "text",
+            data: {id:id},
+            success: function (value) {
+                var data = JSON.parse(value);
+                var customer_transaction = data.st_customer_id;
+                @foreach($customers as $customer)
+                    if({{$customer->customer_id}} == customer_transaction){
+                        $('#sales_transaction_number_delayed_charge').val(data.st_no);
+                        $('#invoicecustomer').append('<option value="{{$customer->customer_id}}" selected>{{$customer->display_name}}</option>');
+                        $('#invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#term').val('{{$customer->terms}}');
+                        $('#invoicedate').val(data.st_date);
+                        $('#invoiceduedate').val(data.st_due_date);
+                        $('#note').val(data.st_note);
+                        $('#memo').val(data.st_memo);
+                        
+                        $.ajax({
+                            method: "GET",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            url: "{{ route('get_all_delayed_charge') }}",
+                            dataType: "text",
+                            data: {id:data.st_no},
+                            success: function (value) {
+                                var data = JSON.parse(value);
+
+                                console.log(data)
+                                for($x=0;$x<data.length;$x++){
+                                    var markup = '<tr class="invoice_lines" id="invoice_line'+$('#invoice_table tr').length+'"><td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="invoice_data product_select" id="select_product_name'+$('#invoice_table tr').length+'"><option value="'+data[$x].st_dc_product+'">'+data[$x].st_dc_product_name+'</option></select></td><td class="pt-3-half"><input class="invoice_data" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_dc_desc+'"></td><td class="pt-3-half"><input type="number" class="invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" value="'+data[$x].st_dc_qty+'"></td><td class="pt-3-half"><input class="invoice_data" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_dc_rate+'"></td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'">'+data[$x].st_dc_total+'</td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';
+            
+                                    $("#invoice_table").append(markup);
+                                }
+
+                                var total_invoice = 0;
+                                $('.product_total').each(function() {
+                                    var add_total = $(this).html();
+                                    if(add_total==""){
+                                        add_total=0;
+                                    }
+                                    total_invoice += parseFloat(add_total);
+                                    $('#invoicetotal').html(total_invoice);
+                                });
+                            },
+                            error: function (data) {
+                                swal("Error!", "Transaction failed", "error");
+                            }
+                        });
+
+                        
+                    }
+                 @endforeach
+            },
+            error: function (data) {
+                swal("Error!", "Transaction failed", "error");
+            }
+        });
+    });
+
+    $(document).on('click', '.create_invoice_delayed_credit', function(){
+        var id = $(this).attr('id');
+        
+        $.ajax({
+            method: "GET",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('get_all_transactions') }}",
+            dataType: "text",
+            data: {id:id},
+            success: function (value) {
+                var data = JSON.parse(value);
+                var customer_transaction = data.st_customer_id;
+                @foreach($customers as $customer)
+                    if({{$customer->customer_id}} == customer_transaction){
+                        $('#sales_transaction_number_delayed_credit').val(data.st_no);
+                        $('#invoicecustomer').append('<option value="{{$customer->customer_id}}" selected>{{$customer->display_name}}</option>');
+                        $('#invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_invoicebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#term').val('{{$customer->terms}}');
+                        $('#invoicedate').val(data.st_date);
+                        $('#invoiceduedate').val(data.st_due_date);
+                        $('#note').val(data.st_note);
+                        $('#memo').val(data.st_memo);
+                        
+                        $.ajax({
+                            method: "GET",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            url: "{{ route('get_all_delayed_credit') }}",
+                            dataType: "text",
+                            data: {id:data.st_no},
+                            success: function (value) {
+                                var data = JSON.parse(value);
+
+                                console.log(data)
+                                for($x=0;$x<data.length;$x++){
+                                    var markup = '<tr class="invoice_lines" id="invoice_line'+$('#invoice_table tr').length+'"><td class="pt-3-half" id="number_tag" contenteditable="false">'+$('#invoice_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="invoice_data product_select" id="select_product_name'+$('#invoice_table tr').length+'"><option value="'+data[$x].st_dcredit_product+'">'+data[$x].st_dcredit_product_name+'</option></select></td><td class="pt-3-half"><input class="invoice_data" id="select_product_description'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_dcredit_desc+'"></td><td class="pt-3-half"><input type="number" class="invoice_data product_qty" onclick="this.select();" id="product_qty'+$('#invoice_table tr').length+'" style="border:0; text-align:center;" value="'+data[$x].st_dcredit_qty+'"></td><td class="pt-3-half"><input class="invoice_data" id="select_product_rate'+$('#invoice_table tr').length+'" style="border:0;" value="'+data[$x].st_dcredit_rate+'"></td><td class="pt-3-half product_total" id="total_amount'+$('#invoice_table tr').length+'">'+data[$x].st_dcredit_total+'</td><td class="pt-3-half"><a href="#" id="delete_product'+$('#invoice_table tr').length+'" class="fa fa-trash delete_product"></a></td></tr>';
             
                                     $("#invoice_table").append(markup);
                                 }

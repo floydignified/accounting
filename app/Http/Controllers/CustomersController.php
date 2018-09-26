@@ -8,6 +8,9 @@ use App\SalesTransaction;
 use App\StInvoice;
 use App\StEstimate;
 use App\StSalesReceipt;
+use App\StRefundReceipt;
+use App\StDelayedCharge;
+use App\StDelayedCredit;
 use App\ProductsAndServices;
 
 class CustomersController extends Controller
@@ -89,6 +92,18 @@ class CustomersController extends Controller
             $sales_transaction_estimate->st_status = "Closed";
             $sales_transaction_estimate->save();
         }
+
+        if($request->sales_transaction_number_delayed_charge != '0'){
+            $sales_transaction_delayed_charge = SalesTransaction::where('st_no', $request->sales_transaction_number_delayed_charge)->first();
+            $sales_transaction_delayed_charge->st_status = "Closed";
+            $sales_transaction_delayed_charge->save();
+        }
+
+        if($request->sales_transaction_number_delayed_credit != '0'){
+            $sales_transaction_delayed_credit = SalesTransaction::where('st_no', $request->sales_transaction_number_delayed_credit)->first();
+            $sales_transaction_delayed_credit->st_status = "Closed";
+            $sales_transaction_delayed_credit->save();
+        }
     }
 
     public function add_payment(Request $request){
@@ -129,10 +144,11 @@ class CustomersController extends Controller
         $old_invoice_transaction = SalesTransaction::find($request->sales_transaction_number);
         if($old_invoice_transaction->st_balance <= $request->p_amount){
             $old_invoice_transaction->st_balance = $old_invoice_transaction->st_balance - $request->p_amount;
-            $old_invoice_transaction->st_status = 'Closed';
+            $old_invoice_transaction->st_status = 'Paid';
             $old_invoice_transaction->save();
         }else{
             $old_invoice_transaction->st_balance = $old_invoice_transaction->st_balance - $request->p_amount;
+            $old_invoice_transaction->st_status = 'Partially paid';
             $old_invoice_transaction->save();
         }
         
@@ -211,11 +227,138 @@ class CustomersController extends Controller
             $st_sales_receipt->st_s_qty = $request->input('product_qty_sales_receipt'.$x);
             $st_sales_receipt->st_s_rate = $request->input('select_product_rate_sales_receipt'.$x);
             $st_sales_receipt->st_s_total = $request->input('product_qty_sales_receipt'.$x) * $request->input('select_product_rate_sales_receipt'.$x);
-            $st_sales_receipt->st_p_method = null;
-            $st_sales_receipt->st_p_reference_no = null;
-            $st_sales_receipt->st_p_deposit_to = null;
+            $st_sales_receipt->st_p_method = $request->sr_payment_method;
+            $st_sales_receipt->st_p_reference_no = $request->sr_reference_number;
+            $st_sales_receipt->st_p_deposit_to = $request->sr_deposit_to;
             $st_sales_receipt->st_p_amount = $request->sr_amount_paid;
             $st_sales_receipt->save();
+
+        }
+    }
+
+    public function add_refund_receipt(Request $request)
+    {
+        $sales_number = SalesTransaction::count() + 1001;
+
+        $sales_transaction = new SalesTransaction;
+        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_date = $request->rr_date;
+        $sales_transaction->st_type = $request->transaction_type_refund_receipt;
+        $sales_transaction->st_term = null;
+        $sales_transaction->st_customer_id = $request->rr_customer;
+        $sales_transaction->st_due_date = null;
+        $sales_transaction->st_status = 'Closed';
+        $sales_transaction->st_action = '';
+        $sales_transaction->st_email = $request->rr_email;
+        $sales_transaction->st_send_later = $request->rr_send_later;
+        $sales_transaction->st_bill_address = $request->rr_bill_address;
+        $sales_transaction->st_note = $request->rr_note;
+        $sales_transaction->st_memo = $request->rr_memo;
+        $sales_transaction->st_i_attachment = $request->rr_attachment;
+        $sales_transaction->st_balance = 0;
+        $sales_transaction->save();
+
+        $customer = new Customers;
+        $customer = Customers::find($request->rr_customer);
+
+        for($x=0;$x<$request->product_count_refund_receipt;$x++){
+            $st_refund_receipt = new StRefundReceipt;
+            $st_refund_receipt->st_r_no = $sales_number;
+            $st_refund_receipt->st_r_product = $request->input('select_product_name_refund_receipt'.$x);
+            $st_refund_receipt->st_r_desc = $request->input('select_product_description_refund_receipt'.$x);
+            $st_refund_receipt->st_r_qty = $request->input('product_qty_refund_receipt'.$x);
+            $st_refund_receipt->st_r_rate = $request->input('select_product_rate_refund_receipt'.$x);
+            $st_refund_receipt->st_r_total = $request->input('product_qty_refund_receipt'.$x) * $request->input('select_product_rate_refund_receipt'.$x);
+            $st_refund_receipt->st_p_method = $request->rr_payment_method;
+            $st_refund_receipt->st_p_reference_no = null;
+            $st_refund_receipt->st_p_deposit_to = $request->rr_refund_from;
+            $st_refund_receipt->st_p_amount = $request->rr_amount_refunded;
+            $st_refund_receipt->save();
+
+        }
+    }
+
+
+    public function add_delayed_charge(Request $request)
+    {
+        $sales_number = SalesTransaction::count() + 1001;
+
+        $sales_transaction = new SalesTransaction;
+        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_date = $request->dc_date;
+        $sales_transaction->st_type = $request->transaction_type_delayed_charge;
+        $sales_transaction->st_term = null;
+        $sales_transaction->st_customer_id = $request->dc_customer;
+        $sales_transaction->st_due_date = $request->dc_date;
+        $sales_transaction->st_status = 'Open';
+        $sales_transaction->st_action = '';
+        $sales_transaction->st_email = null;
+        $sales_transaction->st_send_later = null;
+        $sales_transaction->st_bill_address = null;
+        $sales_transaction->st_note = null;
+        $sales_transaction->st_memo = $request->dc_memo;
+        $sales_transaction->st_i_attachment = $request->dc_attachment;
+        $sales_transaction->st_balance = 0;
+        $sales_transaction->save();
+
+        $customer = new Customers;
+        $customer = Customers::find($request->dc_customer);
+
+        for($x=0;$x<$request->product_count_delayed_charge;$x++){
+            $st_delayed_charge = new StDelayedCharge;
+            $st_delayed_charge->st_dc_no = $sales_number;
+            $st_delayed_charge->st_dc_product = $request->input('select_product_name_delayed_charge'.$x);
+            $st_delayed_charge->st_dc_desc = $request->input('select_product_description_delayed_charge'.$x);
+            $st_delayed_charge->st_dc_qty = $request->input('product_qty_delayed_charge'.$x);
+            $st_delayed_charge->st_dc_rate = $request->input('select_product_rate_delayed_charge'.$x);
+            $st_delayed_charge->st_dc_total = $request->input('product_qty_delayed_charge'.$x) * $request->input('select_product_rate_delayed_charge'.$x);
+            $st_delayed_charge->st_p_method = null;
+            $st_delayed_charge->st_p_reference_no = null;
+            $st_delayed_charge->st_p_deposit_to = null;
+            $st_delayed_charge->st_p_amount = null;
+            $st_delayed_charge->save();
+
+        }
+    }
+
+    public function add_delayed_credit(Request $request)
+    {
+        $sales_number = SalesTransaction::count() + 1001;
+
+        $sales_transaction = new SalesTransaction;
+        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_date = $request->dcredit_date;
+        $sales_transaction->st_type = $request->transaction_type_delayed_credit;
+        $sales_transaction->st_term = null;
+        $sales_transaction->st_customer_id = $request->dcredit_customer;
+        $sales_transaction->st_due_date = $request->dcredit_date;
+        $sales_transaction->st_status = 'Open';
+        $sales_transaction->st_action = '';
+        $sales_transaction->st_email = null;
+        $sales_transaction->st_send_later = null;
+        $sales_transaction->st_bill_address = null;
+        $sales_transaction->st_note = null;
+        $sales_transaction->st_memo = $request->dcredit_memo;
+        $sales_transaction->st_i_attachment = $request->dcredit_attachment;
+        $sales_transaction->st_balance = 0;
+        $sales_transaction->save();
+
+        $customer = new Customers;
+        $customer = Customers::find($request->dc_customer);
+
+        for($x=0;$x<$request->product_count_delayed_credit;$x++){
+            $st_delayed_credit = new StDelayedCredit;
+            $st_delayed_credit->st_dcredit_no = $sales_number;
+            $st_delayed_credit->st_dcredit_product = $request->input('select_product_name_delayed_credit'.$x);
+            $st_delayed_credit->st_dcredit_desc = $request->input('select_product_description_delayed_credit'.$x);
+            $st_delayed_credit->st_dcredit_qty = $request->input('product_qty_delayed_credit'.$x);
+            $st_delayed_credit->st_dcredit_rate = $request->input('select_product_rate_delayed_credit'.$x);
+            $st_delayed_credit->st_dcredit_total = $request->input('product_qty_delayed_credit'.$x) * $request->input('select_product_rate_delayed_credit'.$x);
+            $st_delayed_credit->st_p_method = null;
+            $st_delayed_credit->st_p_reference_no = null;
+            $st_delayed_credit->st_p_deposit_to = null;
+            $st_delayed_credit->st_p_amount = null;
+            $st_delayed_credit->save();
 
         }
     }
@@ -249,10 +392,14 @@ class CustomersController extends Controller
             return '<span> try </span>';
         })
         ->addColumn('action', function($sales_transaction){
-            if($sales_transaction->st_status == "Open" && $sales_transaction->st_type == "Invoice"){
+            if($sales_transaction->st_status == "Open" && $sales_transaction->st_type == "Invoice" || $sales_transaction->st_status == "Partially paid" && $sales_transaction->st_type == "Invoice"){
                 return '<span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden="true">Receive Payment</i></a></span>';
             }else if($sales_transaction->st_status == "Pending" && $sales_transaction->st_type == "Estimate"){
-                return '<span class="table-add mb-3 mr-2"><a class="text-info create_invoice" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#invoicemodal"><i aria-hidden="true">Create Invoice</i></a></span>';
+                return '<span class="table-add mb-3 mr-2"><a class="text-info create_invoice_estimate" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#invoicemodal"><i aria-hidden="true">Create Invoice</i></a></span>';
+            }else if($sales_transaction->st_status == "Open" && $sales_transaction->st_type == "Charge"){
+                return '<span class="table-add mb-3 mr-2"><a class="text-info create_invoice_delayed_charge" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#invoicemodal"><i aria-hidden="true">Create Invoice</i></a></span>';
+            }else if($sales_transaction->st_status == "Open" && $sales_transaction->st_type == "Credit"){
+                return '<span class="table-add mb-3 mr-2"><a class="text-info create_invoice_delayed_credit" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#invoicemodal"><i aria-hidden="true">Create Invoice</i></a></span>';
             }else{
                 return '<span class="table-add mb-3 mr-2">N/A</span>';
             }                
@@ -270,6 +417,10 @@ class CustomersController extends Controller
                 return 'PHP '.number_format($sales_transaction->estimate_info->sum('st_e_total'), 2);  
             }else if($sales_transaction->st_type == "Sales Receipt"){
                 return 'PHP '.number_format($sales_transaction->sales_receipt_info->sum('st_s_total'), 2);  
+            }else if($sales_transaction->st_type == "Refund Receipt"){
+                return 'PHP '.number_format($sales_transaction->refund_receipt_info->sum('st_r_total'), 2);  
+            }else if($sales_transaction->st_type == "Charge"){
+                return 'PHP '.number_format($sales_transaction->delayed_charge_info->sum('st_dc_total'), 2);  
             }else{
                 return 'PHP '.number_format($sales_transaction->st_amount_paid, 2);  
             }           
@@ -292,7 +443,7 @@ class CustomersController extends Controller
             return '<span> try </span>';
         })
         ->addColumn('action', function($sales_transaction){
-            if($sales_transaction->st_status == "Open"){
+            if($sales_transaction->st_status == "Open" || $sales_transaction->st_status == "Partially paid"){
                 return '<span class="table-add mb-3 mr-2"><a class="text-info receive_payment" id="'.$sales_transaction->st_no.'" href="#" data-toggle="modal" data-target="#receivepaymentmodal"><i aria-hidden="true">Receive Payment</i></a>
                 <select>
                 <option></option>
@@ -357,5 +508,35 @@ class CustomersController extends Controller
          }
 
         return $st_estimates;
+    }
+
+    public function get_all_delayed_charge(Request $request){
+        $st_delayed_charge = StDelayedCharge::where('st_dc_no', $request->id)->get();
+        $products = ProductsAndServices::all();
+
+        foreach($st_delayed_charge as $delayed_charge){
+            foreach($products as $product){
+                if($delayed_charge->st_dc_product == $product->product_id){
+                    $delayed_charge['st_dc_product_name'] = $product->product_name;
+                }
+            }
+         }
+
+        return $st_delayed_charge;
+    }
+
+    public function get_all_delayed_credit(Request $request){
+        $st_delayed_credit = StDelayedCredit::where('st_dcredit_no', $request->id)->get();
+        $products = ProductsAndServices::all();
+
+        foreach($st_delayed_credit as $delayed_credit){
+            foreach($products as $product){
+                if($delayed_credit->st_dcredit_product == $product->product_id){
+                    $delayed_credit['st_dcredit_product_name'] = $product->product_name;
+                }
+            }
+         }
+
+        return $st_delayed_credit;
     }
 }
