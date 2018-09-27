@@ -57,5 +57,9 @@ class SalesTransaction extends Model
     public function delayed_credit_info(){
 	    return $this->hasMany('App\StDelayedCredit','st_dcredit_no','st_no');
     }
+
+    public function credit_note_info(){
+	    return $this->hasMany('App\StCreditNote','st_cn_no','st_no');
+    }
     
 }

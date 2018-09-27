@@ -11,6 +11,7 @@ use App\StSalesReceipt;
 use App\StRefundReceipt;
 use App\StDelayedCharge;
 use App\StDelayedCredit;
+use App\StCreditNote;
 use App\ProductsAndServices;
 
 class CustomersController extends Controller
@@ -359,6 +360,48 @@ class CustomersController extends Controller
             $st_delayed_credit->st_p_deposit_to = null;
             $st_delayed_credit->st_p_amount = null;
             $st_delayed_credit->save();
+
+        }
+    }
+
+    public function add_credit_note(Request $request)
+    {
+        $sales_number = SalesTransaction::count() + 1001;
+
+        $sales_transaction = new SalesTransaction;
+        $sales_transaction->st_no = $sales_number;
+        $sales_transaction->st_date = $request->cn_date;
+        $sales_transaction->st_type = $request->transaction_type_credit_note;
+        $sales_transaction->st_term = null;
+        $sales_transaction->st_customer_id = $request->cn_customer;
+        $sales_transaction->st_due_date = null;
+        $sales_transaction->st_status = 'Closed';
+        $sales_transaction->st_action = '';
+        $sales_transaction->st_email = $request->cn_email;
+        $sales_transaction->st_send_later = $request->cn_send_later;
+        $sales_transaction->st_bill_address = $request->cn_bill_address;
+        $sales_transaction->st_note = $request->cn_note;
+        $sales_transaction->st_memo = $request->cn_memo;
+        $sales_transaction->st_i_attachment = $request->cn_attachment;
+        $sales_transaction->st_amount_paid = $request->total_balance_credit_note;
+        $sales_transaction->save();
+
+        $customer = new Customers;
+        $customer = Customers::find($request->cn_customer);
+
+        for($x=0;$x<$request->product_count_credit_note;$x++){
+            $st_credit_note = new StCreditNote;
+            $st_credit_note->st_cn_no = $sales_number;
+            $st_credit_note->st_cn_product = $request->input('select_product_name_credit_note'.$x);
+            $st_credit_note->st_cn_desc = $request->input('select_product_description_credit_note'.$x);
+            $st_credit_note->st_cn_qty = $request->input('product_qty_credit_note'.$x);
+            $st_credit_note->st_cn_rate = $request->input('select_product_rate_credit_note'.$x);
+            $st_credit_note->st_cn_total = $request->input('product_qty_credit_note'.$x) * $request->input('select_product_rate_credit_note'.$x);
+            $st_credit_note->st_p_method = null;
+            $st_credit_note->st_p_reference_no = null;
+            $st_credit_note->st_p_deposit_to = null;
+            $st_credit_note->st_p_amount = null;
+            $st_credit_note->save();
 
         }
     }

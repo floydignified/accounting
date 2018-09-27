@@ -29,6 +29,7 @@ Route::group(['middleware'=>['auth']], function() {
     Route::post('/add_refund_receipt', 'CustomersController@add_refund_receipt')->name('add_refund_receipt');
     Route::post('/add_delayed_charge', 'CustomersController@add_delayed_charge')->name('add_delayed_charge');
     Route::post('/add_delayed_credit', 'CustomersController@add_delayed_credit')->name('add_delayed_credit');
+    Route::post('/add_credit_note', 'CustomersController@add_credit_note')->name('add_credit_note');
 
     Route::get('/refresh_sales_table', 'CustomersController@refresh_sales_table')->name('refresh_sales_table');
     Route::get('/refresh_sales_table_invoice', 'CustomersController@refresh_sales_table_invoice')->name('refresh_sales_table_invoice');

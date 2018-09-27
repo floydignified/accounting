@@ -390,4 +390,10 @@ jQuery(document).ready(function($) {
 		$('#delayedcreditmodal').modal('hide');
 	});
 
+	$("#add_credit_note_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#creditnotemodal').modal('hide');
+	});
+
 });

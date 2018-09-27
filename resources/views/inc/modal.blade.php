@@ -1,7 +1,7 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 <div class="modal fade" id="addcustomermodal" tabindex="-1" role="dialog" aria-labelledby="staticModalLabel" aria-hidden="true" data-backdrop="static">
-    <form action="#" class="form-horizontal " id="add_customer_form" onsubmit="addCustomer()">
+    <form action="#" class="form-horizontal " id="add_customer_form" onsubmit="addCustomer()" autocomplete="off">
     {{ csrf_field() }}
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -82,11 +82,11 @@
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 p-0 pr-1">
                             <p>Payment Method<p>
-                            <input type="text" name="payment_method" class="w-100" required>
+                            <input type="text" list="payment_method_list" name="payment_method" class="w-100" required>
                         </div>
                         <div class="col-md-6 p-0">
                             <p>Terms</p>
-                            <input type="text" name="terms" class="w-100" required>
+                            <input type="text" list="terms_list" name="terms" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 p-0">
@@ -129,7 +129,7 @@
     </form>
 </div>
 <div class="modal fade p-0" id="invoicemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_invoice_form" onsubmit="addInvoice()">
+<form action="#" class="form-horizontal " id="add_invoice_form" onsubmit="addInvoice()" autocomplete="off">
 {{ csrf_field() }}
     <input id="transaction_type" name="transaction_type" value="Invoice" hidden>
     <input id="product_count" name="product_count" value="0" hidden>
@@ -180,8 +180,6 @@
                             <p>Terms</p>
                             <input class="w-100" list="terms_list" name="term" id="term" required>
                             <datalist id="terms_list">
-                                <option></option>
-                                <option>Add New</option>
                                 <option>Due on Receipt</option>
                                 <option>Net15</option>
                                 <option>Net30</option>
@@ -266,7 +264,7 @@
 </form>
 </div>
 <div class="modal fade p-0" id="receivepaymentmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_payment_form" onsubmit="addPayment()">
+<form action="#" class="form-horizontal " id="add_payment_form" onsubmit="addPayment()" autocomplete="off">
 {{ csrf_field() }}
     <input id="sales_transaction_number" name="sales_transaction_number" value="" hidden>
     <input id="payment_customer_id" name="payment_customer_id" value="" hidden>
@@ -311,7 +309,13 @@
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Payment Method</p>
-                            <input type="text" name="p_payment_method" id="p_payment_method" placeholder="Choose payment method" class="w-100" required>
+                            <input type="text" list="payment_method_list" name="p_payment_method" id="p_payment_method" placeholder="Choose payment method" class="w-100" required>
+                            <datalist id="payment_method_list">
+                                <option>Cash</option>
+                                <option>Cheque</option>
+                                <option>Debit card</option>
+                                <option>Credit card</option>
+                            </datalist>
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Reference No.</p>
@@ -364,7 +368,7 @@
     </form>
 </div>
 <div class="modal fade p-0" id="estimatemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_estimate_form" onsubmit="addEstimate()">
+<form action="#" class="form-horizontal " id="add_estimate_form" onsubmit="addEstimate()" autocomplete="off">
 {{ csrf_field() }}
     <input id="transaction_type_estimate" name="transaction_type_estimate" value="Estimate" hidden>
     <input id="product_count_estimate" name="product_count_estimate" value="0" hidden>
@@ -485,7 +489,7 @@
 </form>
 </div>
 <div class="modal fade p-0" id="salesreceiptmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_sales_receipt_form" onsubmit="addSalesReceipt()">
+<form action="#" class="form-horizontal " id="add_sales_receipt_form" onsubmit="addSalesReceipt()" autocomplete="off">
 {{ csrf_field() }}
     <input id="transaction_type_sales_receipt" name="transaction_type_sales_receipt" value="Sales Receipt" hidden>
     <input type="number" id="total_balance_sales_receipt" name="total_balance_sales_receipt" value="0" hidden>
@@ -537,7 +541,7 @@
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Payment Method</p>
-                            <input type="text" name="sr_payment_method" id="sr_payment_method" placeholder="Choose payment method" class="w-100" required>
+                            <input type="text"  list="payment_method_list" name="sr_payment_method" id="sr_payment_method" placeholder="Choose payment method" class="w-100" required>
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Reference No.</p>
@@ -623,6 +627,11 @@
 </form>
 </div>
 <div class="modal fade p-0" id="creditnotemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_credit_note_form" onsubmit="addCreditNote()" autocomplete="off">
+{{ csrf_field() }}
+    <input id="transaction_type_credit_note" name="transaction_type_credit_note" value="Credit Note" hidden>
+    <input type="number" id="total_balance_credit_note" name="total_balance_credit_note" value="0" hidden>
+    <input id="product_count_credit_note" name="product_count_credit_note" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -635,13 +644,18 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-4 p-0 pr-3">
-                            <input id="creditncustomer" type="text" name="" placeholder="Choose a customer" class="w-100">
+                            <select id="refundrcustomer" type="text" name="cn_customer" class="w-100" required>
+                                <option value=""></option>
+                                @foreach($customers as $customer)
+                                <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-4 p-0">
-                            <input type="text" name="" placeholder="Email (Separate emails with a comma)" class="w-100">
+                            <input type="text" name="cn_email" id="cn_email" placeholder="Email (Separate emails with a comma)" class="w-100">
                             <br>
                             <div class="float-left">
-                                <input type="checkbox" name="">Send Later
+                                <input type="checkbox" name="cn_send_later">Send Later
                             </div>
                             <div class="float-right">
                                 <p class="text-info">Cc/Bcc</p>
@@ -649,20 +663,20 @@
                         </div>
                         <div class="col-md-4 p-0 d-inline-flex center-content">
                             <h4 class="mr-2">BALANCE DUE: </h4>
-                            <h3 id="creditnbalance">PHP 0.00</h3>
+                            <h3 id="big_credit_notebalance">PHP 0.00</h3>
                         </div>
                     </div>
                     <div class="col-md-12 p-0 mt-3">
                         <div class="col-md-4 p-0 pr-3">
                             <p>Billing Address</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="cn_bill_address" id="cn_bill_address" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Credit Note Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="cn_date" id="cn_date" class="w-100" required>
                         </div>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="credit_note_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -672,39 +686,19 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
                         <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Subtotal</button>
+                                <button type="button" class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_credit_note">Add Lines</button>
+                                <button type="button" class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_credit_note">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="mb-0 pr-4 text-dark font-weight-bold">TOTAL</p>
-                                <p class="mb-0 text-dark font-weight-bold">PHP 1400.00</p>
+                                <p class="mb-0 text-dark font-weight-bold" id="credit_notetotal">PHP 0.00</p>
                             </div>
                         </div>
                     </div>
@@ -712,18 +706,18 @@
                         <div class="float-right mr-5">
                             <div class="d-inline-flex mr-4">
                                 <p class="pr-4 text-dark font-weight-bold">BALANCE DUE</p>
-                                <p class="text-dark font-weight-bold">PHP 500.00</p>
+                                <p class="text-dark font-weight-bold" id="credit_notebalance">PHP 0.00</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 pl-0">
                             <p>Message Displayed on Credit Note</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="cn_message" required></textarea>
                         </div>
                         <div class="col-md-6 pr-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="cn_memo" required></textarea>
                         </div>
                     </div>
                     <div class="col-md-6 m-0 p-0 mt-3">
@@ -733,7 +727,7 @@
                         </div>
                         <div class="input-group mb-3 p-0">
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                <input type="file" name="cn_attachment" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                 <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                             </div>
                         </div>
@@ -742,13 +736,14 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="creditnadd"class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="creditnadd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="refundreceiptmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_refund_receipt_form" onsubmit="addRefundReceipt()">
+<form action="#" class="form-horizontal " id="add_refund_receipt_form" onsubmit="addRefundReceipt()" autocomplete="off">
 {{ csrf_field() }}
     <input id="transaction_type_refund_receipt" name="transaction_type_refund_receipt" value="Refund Receipt" hidden>
     <input type="number" id="total_balance_refund_receipt" name="total_balance_refund_receipt" value="0" hidden>
@@ -800,7 +795,7 @@
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Payment Method</p>
-                            <input type="text" name="rr_payment_method" id="rr_payment_method" placeholder="Choose payment method" class="w-100" required>
+                            <input type="text" list="payment_method_list" name="rr_payment_method" id="rr_payment_method" placeholder="Choose payment method" class="w-100" required>
                         </div>
                         <div class="col-md-3 p-0 pr-3">
                             <p>Refund from</p>
@@ -883,7 +878,7 @@
 </form>
 </div>
 <div class="modal fade p-0" id="delayedcreditmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_delayed_credit_form" onsubmit="addDelayedCredit()">
+<form action="#" class="form-horizontal " id="add_delayed_credit_form" onsubmit="addDelayedCredit()" autocomplete="off">
 {{ csrf_field() }}
 <input id="transaction_type_delayed_credit" name="transaction_type_delayed_credit" value="Credit" hidden>
 <input id="product_count_delayed_credit" name="product_count_delayed_credit" value="0" hidden>
@@ -974,7 +969,7 @@
 </form>
 </div>
 <div class="modal fade p-0" id="delayedchargemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
-<form action="#" class="form-horizontal " id="add_delayed_charge_form" onsubmit="addDelayedCharge()">
+<form action="#" class="form-horizontal " id="add_delayed_charge_form" onsubmit="addDelayedCharge()" autocomplete="off">
 {{ csrf_field() }}
 <input id="transaction_type_delayed_charge" name="transaction_type_delayed_charge" value="Charge" hidden>
 <input id="product_count_delayed_charge" name="product_count_delayed_charge" value="0" hidden>
@@ -2693,61 +2688,6 @@
 </div>
 
 <script>
-    $(document).ready(function(){
- 
-        $("#coaadd").click(function(){
- 
-            var coaAccountType = $("#coaAccountType").val();
-            var coaDetailType = $("#coaDetailType").val();
-            var coaName = $("#coaName").val();
-            var coaDesc = $("#coaDesc").val();
-            var coaBalance = $("#coaBalance").val();
-
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-
-            var markup = "<tr><td class='pt-3-half' contenteditable='false'>"+ coaName +"</td><td class='pt-3-half' contenteditable='false'>"+ coaAccountType +"</td><td class='pt-3-half' contenteditable='false'>"+ coaDetailType +"</td><td class='pt-3-half' contenteditable='false'>PHP "+ coaBalance +".00</td><td class='pt-3-half' contenteditable='false'>PHP "+ coaBalance +".00</td><td class='text-center'><span class='table-add mb-3 mr-2'><div class='btn-group'><button type='button' class='btn bg-transparent text-info'>Accounts History</button><button type='button' class='btn bg-transparent dropdown-toggle px-1' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'><span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu'><a class='dropdown-item' href=''>Connect Bank</a><a class='dropdown-item' href=''>Edit</a><a class='dropdown-item' href=''>Delete</a><a class='dropdown-item' href=''>Run Report</a></div></div></span></td></tr>";
- 
-        $("#coatable").append(markup);
- 
-     });         
- });    
-</script>
-<script>
-    $(document).ready(function(){
-    
-        $("#estimateadd").click(function(){
-            
-            var estimatecustomer = $("#estimatecustomer").val();
-            var estimatebalance = $("#estimatebalance").text();
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>9/7/2018</td><td class='pt-3-half' contenteditable='true'>Estimate</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+estimatecustomer+"</td><td class='pt-3-half' contenteditable='true'>9/6/2018</td><td class='pt-3-half' contenteditable='true'>"+estimatebalance+"</td><td class='pt-3-half' contenteditable='true'>"+estimatebalance+"</td><td class='pt-3-half' contenteditable='true'>Open</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true' data-target='#receivepaymentmodal'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#salestable").append(markup);
-    
-     });         
-    });    
-</script>
-<script>
-    $(document).ready(function(){
-    
-        $("#creditnadd").click(function(){
-            
-            var creditncustomer = $("#creditncustomer").val();
-            var creditnbalance = $("#creditnbalance").text();
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>9/7/2018</td><td class='pt-3-half' contenteditable='true'>Credit Note</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+creditncustomer+"</td><td class='pt-3-half' contenteditable='true'>9/6/2018</td><td class='pt-3-half' contenteditable='true'>"+creditnbalance+"</td><td class='pt-3-half' contenteditable='true'>"+creditnbalance+"</td><td class='pt-3-half' contenteditable='true'>Open</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true' data-target='#receiveModal'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#salestable").append(markup);
-    
-     });         
-    });    
-</script>
-
-<script>
     var sales_table;
     var sales_table_invoice;
     var customers_table;
@@ -3156,7 +3096,7 @@
             }
         });
 
-        }
+    }
 
     function addDelayedCharge(){
 
@@ -3255,6 +3195,56 @@
             swal("Error!", "Delayed credit failed", "error");
         }
     });
+
+    }
+
+    function addCreditNote(){
+
+        $('#total_balance_credit_note').val($('#credit_notetotal').text());
+
+        $(".credit_note_lines").each(function() {
+            $("#product_count_credit_note").val(parseInt($("#product_count_credit_note").val())+1);
+        });
+
+        var counter = 0;
+        var checker = 0;
+
+        $(".credit_note_lines").find('.credit_note_data').each(function() {
+            var id = $(this).attr("id");
+            var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+            
+            $(this).attr("name", name+counter);
+            
+            checker++;
+            if(checker%4==0){
+                counter++;
+            }
+        });
+
+
+        $.ajax({
+            method: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{ route('add_credit_note') }}",
+            dataType: "text",
+            data: $('#add_credit_note_form').serialize(),
+            success: function (data) {
+                swal("Done!", "Added credit note", "success");
+                $("#product_count_credit_note").val('0');
+                checker = 0;
+                counter = 0;
+                $('#add_credit_note_form')[0].reset();
+                $('.credit_note_lines').remove();
+                
+                sales_table.ajax.reload();
+                sales_table_invoice.ajax.reload();
+            },
+            error: function (data) {
+                swal("Error!", "Credit note failed", "error");
+            }
+        });
 
     }
     
@@ -4205,6 +4195,149 @@
                 }
                 total_delayed_credit += parseFloat(add_total);
                 $('#delayed_credittotal').html(total_delayed_credit);
+            });
+        }
+
+        // ------------------------------------------------------------- CREDIT NOTICE STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_credit_note', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_credit_note' + position).val('');
+                $('#select_product_rate_credit_note' + position).val('');
+                $('#total_amount_credit_note' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_credit_note' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_credit_note' + position).val(price);
+                        $('#total_amount_credit_note' + position).html(price * $('#product_qty_credit_note' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_credit_note();
+        });
+
+        $(document).on('change', '#refundrcustomer', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#credit_notebalance').html('PHP 0.00');
+                $('#big_credit_notebalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#credit_notebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_credit_notebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#cn_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#cn_payment_method').val('{{$customer->payment_method}}');
+                        $('#cn_email').val('{{$customer->email}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_credit_note', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_credit_note'  + position).html($('#select_product_rate_credit_note'  + position).val() * $('#product_qty_credit_note' + position).val());
+           
+            update_total_credit_note();
+        });
+
+        $(document).on('change', '.credit_note_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_credit_note'  + position).html($('#select_product_rate_credit_note'  + position).val() * $('#product_qty_credit_note' + position).val());
+           
+            update_total_credit_note();
+        });
+
+
+        $("#add_lines_credit_note").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="credit_note_lines" id="credit_note_line'+$('#credit_note_table tr').length+'"><td class="pt-3-half" id="number_tag_credit_note" contenteditable="false">'+$('#credit_note_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="credit_note_data product_select_credit_note" id="select_product_name_credit_note'+$('#credit_note_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="credit_note_data product_description_credit_note" id="select_product_description_credit_note'+$('#credit_note_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="credit_note_data product_qty_credit_note" onclick="this.select();" id="product_qty_credit_note'+$('#credit_note_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="credit_note_data product_rate_credit_note" id="select_product_rate_credit_note'+$('#credit_note_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_credit_note" id="total_amount_credit_note'+$('#credit_note_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_credit_note'+$('#credit_note_table tr').length+'" class="fa fa-trash delete_product_credit_note"></a></td></tr>';
+            
+            $("#credit_note_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_credit_note").click(function(event){
+            event.preventDefault();
+            $('.credit_note_lines').remove();
+
+            $('#credit_notetotal').html('0.00');
+        }); 
+
+        $(document).on('click', '.delete_product_credit_note', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#credit_note_line'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".credit_note_lines").each(function() {
+                $(this).attr("id","credit_note_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_credit_note").each(function() {
+                $(this).attr("id","delete_product_credit_note"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".credit_note_lines").find('#number_tag_credit_note').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_credit_note').each(function() {
+                $(this).attr("id","select_product_name_credit_note"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_credit_note').each(function() {
+                $(this).attr("id","select_product_description_credit_note"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_credit_note').each(function() {
+                $(this).attr("id","product_qty_credit_note"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_credit_note').each(function() {
+                $(this).attr("id","select_product_rate_credit_note"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_credit_note").each(function() {
+                $(this).attr("id","total_amount_credit_note"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_credit_note();
+        }); 
+
+        function update_total_credit_note(){
+            var total_credit_note = 0;
+            $('.product_total_credit_note').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_credit_note += parseFloat(add_total);
+                $('#credit_notetotal').html(total_credit_note);
             });
         }
 
