@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Customers;
 use App\SalesTransaction;
 use App\StInvoice;
@@ -13,6 +14,7 @@ use App\StDelayedCharge;
 use App\StDelayedCredit;
 use App\StCreditNote;
 use App\ProductsAndServices;
+use PDF;
 
 class CustomersController extends Controller
 {
@@ -354,7 +356,7 @@ class CustomersController extends Controller
             $st_delayed_credit->st_dcredit_desc = $request->input('select_product_description_delayed_credit'.$x);
             $st_delayed_credit->st_dcredit_qty = $request->input('product_qty_delayed_credit'.$x);
             $st_delayed_credit->st_dcredit_rate = $request->input('select_product_rate_delayed_credit'.$x);
-            $st_delayed_credit->st_dcredit_total = $request->input('product_qty_delayed_credit'.$x) * $request->input('select_product_rate_delayed_credit'.$x);
+            $st_delayed_credit->st_dcredit_total = -$request->input('product_qty_delayed_credit'.$x) * $request->input('select_product_rate_delayed_credit'.$x);
             $st_delayed_credit->st_p_method = null;
             $st_delayed_credit->st_p_reference_no = null;
             $st_delayed_credit->st_p_deposit_to = null;
@@ -383,7 +385,7 @@ class CustomersController extends Controller
         $sales_transaction->st_note = $request->cn_note;
         $sales_transaction->st_memo = $request->cn_memo;
         $sales_transaction->st_i_attachment = $request->cn_attachment;
-        $sales_transaction->st_amount_paid = $request->total_balance_credit_note;
+        $sales_transaction->st_amount_paid = -$request->total_balance_credit_note;
         $sales_transaction->save();
 
         $customer = new Customers;
@@ -404,6 +406,27 @@ class CustomersController extends Controller
             $st_credit_note->save();
 
         }
+
+        $data = array(
+            'name' => $customer->display_name,
+            'email' => $request->cn_email,
+            'title' => 'CREDIT NOTE'
+        );
+
+        $pdf = PDF::loadView('credit_note_pdf', $data);
+
+        $attachment = $pdf->stream('credit_notice.pdf');
+
+        Mail::send(['text'=>'mail'], $data, function($message) use ($data)
+        {
+            $pdf = PDF::loadView('credit_note_pdf', $data);
+            $attachment = $pdf->stream('credit_notice.pdf');
+            $message->attachData($attachment, 'invoice.pdf');
+
+            $message->to($data['email'],'Hello Mr/Mrs '.$data['name'])->subject('This is a credit note for '.$data['name']);
+            $message->from('floydignified@gmail.com','Floyd Matabilas');
+        });
+
     }
 
     public function refresh_customers_table(){
@@ -464,6 +487,8 @@ class CustomersController extends Controller
                 return 'PHP '.number_format($sales_transaction->refund_receipt_info->sum('st_r_total'), 2);  
             }else if($sales_transaction->st_type == "Charge"){
                 return 'PHP '.number_format($sales_transaction->delayed_charge_info->sum('st_dc_total'), 2);  
+            }else if($sales_transaction->st_type == "Credit"){
+                return 'PHP '.number_format($sales_transaction->delayed_credit_info->sum('st_dcredit_total'), 2);  
             }else{
                 return 'PHP '.number_format($sales_transaction->st_amount_paid, 2);  
             }           
