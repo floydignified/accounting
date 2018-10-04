@@ -40,6 +40,8 @@ Route::group(['middleware'=>['auth']], function() {
     Route::get('/get_all_delayed_charge', 'CustomersController@get_all_delayed_charge')->name('get_all_delayed_charge');
     Route::get('/get_all_delayed_credit', 'CustomersController@get_all_delayed_credit')->name('get_all_delayed_credit');
 
+    Route::post('/add_expense', 'SuppliersController@add_expense')->name('add_expense');
+   
     Route::get('generate_pdf','PdfController@generate');
 
     Route::get('/reports', 'PagesController@reports');

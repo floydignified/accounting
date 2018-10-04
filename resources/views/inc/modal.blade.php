@@ -86,7 +86,7 @@
                         </div>
                         <div class="col-md-6 p-0">
                             <p>Terms</p>
-                            <input type="text" list="terms_list" name="terms" class="w-100" required>
+                            <input type="text" list="terms_list" name="terms" id="terms" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 p-0">
@@ -180,10 +180,10 @@
                             <p>Terms</p>
                             <input class="w-100" list="terms_list" name="term" id="term" required>
                             <datalist id="terms_list">
-                                <option>Due on Receipt</option>
-                                <option>Net15</option>
-                                <option>Net30</option>
-                                <option>Net60</option>
+                                <option>Due on receipt</option>
+                                <option>Net 15</option>
+                                <option>Net 30</option>
+                                <option>Net 60</option>
                             </datalist>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
@@ -644,7 +644,7 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-4 p-0 pr-3">
-                            <select id="refundrcustomer" type="text" name="cn_customer" class="w-100" required>
+                            <select id="creditncustomer" type="text" name="cn_customer" class="w-100" required>
                                 <option value=""></option>
                                 @foreach($customers as $customer)
                                 <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
@@ -1060,6 +1060,10 @@
 </form>
 </div>
 <div class="modal fade p-0" id="expensemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_expense_form" onsubmit="addExpense()" autocomplete="off">
+{{ csrf_field() }}
+<input id="item_count_expenses" name="item_count_expenses" value="0" hidden>
+<input id="account_count_expenses" name="account_count_expenses" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -1072,14 +1076,19 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-3 p-0 pr-3">
-                            <input id="expensepayee" type="text" name="" placeholder="Choose a payee" class="w-100">
+                        <select id="expensepayee" type="text" name="expense_customer" class="w-100" required>
+                            <option value=""></option>
+                            @foreach($customers as $customer)
+                            <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                            @endforeach
+                            </select>
                         </div>
                         <div class="col-auto p-0 pr-2">
                             <p class="font12 font-weight-bold float-right">Bank/Credit Account</p>
                         </div>
                         <div class="col-md-3 p-0">
                             <!-- <p class="font12 font-weight-bold">Bank/Credit Account</p> -->
-                            <input type="text" name="" placeholder="Cash and Cash Equivalents" class="w-100">
+                            <input type="text" list="payment_deposit" name="expense_account" class="w-100" required>
                         </div>
                         <div class="col-auto p-0 pl-2">
                             <p class="font12 font-weight-bold float-right">Balance PHP 100</p>
@@ -1092,63 +1101,53 @@
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-2 p-0 pr-3">
                             <p>Payment Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="expense_date" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Payment Method</p>
-                            <input type="text" name="" placeholder="Enter text" class="w-100">
+                            <input type="text" list="payment_method_list" name="expense_payment_method" id="expense_payment_method" placeholder="Enter text" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Reference No.</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="expense_reference_no" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1">
                         <h4>Account Details</h4>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="expense_account_table">
                         <tr>
                             <th class="text-left">#</th>
-                            <th class="text-left">PRODUCT/SERVICE</th>
+                            <th class="text-left">ACCOUNT</th>
                             <th class="text-left">DESCRIPTION</th>
-                            <th class="text-center">QTY</th>
-                            <th class="text-left">RATE</th>
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
                         <!-- This is our clonable table line -->
                     </table>
+                    <datalist id="account_expenses">
+                    <option value="Amortisation expense">Expenses</option>
+                    <option value="Bad debts">Expenses</option>
+                    <option value="Bank charges">Expenses</option>
+                    <option value="Commissions and fees">Expenses</option>
+                    <option value="Dues and subscriptions">Expenses</option>
+                    <option value="Equipment rental">Expenses</option>
+                    <option value="Income tax expense">Expenses</option>
+                    <option value="Insurance - Disablity">Expenses</option>
+                    <option value="Insurance - General">Expenses</option>
+                    </datalist>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_expense_account">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_expense_account">Clear All Lines</button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1 mt-4">
                         <h4>Item Details</h4>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="expense_item_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -1158,32 +1157,12 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_expense_item">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_expense_item">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
@@ -1196,7 +1175,7 @@
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" name="expense_memo" class="w-100" required></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0">
                             <div class="d-inline-flex">
@@ -1205,7 +1184,7 @@
                             </div>
                             <div class="input-group mb-3 p-0">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <input type="file" name="expense_attachment" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                     <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                                 </div>
                             </div>
@@ -1215,10 +1194,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="expenseadd" class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="expenseadd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="chequemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
@@ -3247,25 +3227,77 @@
         });
 
     }
-    
-</script>
 
-<script>
-    $(document).ready(function(){
+function addExpense(){
+
+    //$('#total_balance').val($('#invoicetotal').text());
     
-        $("#expenseadd").click(function(){
-            
-            var expensepayee = $("#expensepayee").val();
-   
+    $(".expense_lines_item").each(function() {
+        $("#item_count_expenses").val(parseInt($("#item_count_expenses").val())+1);
+    });
+
+    $(".expense_lines_account").each(function() {
+        $("#account_count_expenses").val(parseInt($("#account_count_expenses").val())+1);
+    });
+
+    var counter = 0;
+    var checker = 0;
+
+    var counter1 = 0;
+    var checker1 = 0;
+
+    $(".expense_lines_item").find('.expense_data').each(function() {
+        var id = $(this).attr("id");
+        var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+        
+        $(this).attr("name", name+counter);
+        
+        checker++;
+        if(checker%4==0){
+            counter++;
+        }
+    });
+
+    $(".expense_lines_account").find('.expense_data').each(function() {
+        var id = $(this).attr("id");
+        var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+        
+        $(this).attr("name", name+counter1);
+        
+        checker1++;
+        if(checker1%3==0){
+            counter1++;
+        }
+    });
+
+
+    $.ajax({
+        method: "POST",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "{{ route('add_expense') }}",
+        dataType: "text",
+        data: $('#add_expense_form').serialize(),
+        success: function (data) {
+            swal("Done!", "Added expense", "success");
+            $("#item_count_expenses").val('0');
+            $("#accountcount_expenses").val('0');
+            checker = 0;
+            counter = 0;
+            $('#add_expense_form')[0].reset();
+            $('.expense_lines_item').remove();
+            $('.expense_lines_account').remove();
+            sales_table.ajax.reload();
+            sales_table_invoice.ajax.reload();
+        },
+        error: function (data) {
+            swal("Error!", "Expense failed", "error");
+        }
+    });
+
+}
     
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>7/26/2018</td><td class='pt-3-half' contenteditable='true'>Expense</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+expensepayee+"</td><td class='pt-3-half' contenteditable='true'><select><option>Bad Debts</option></select></td><td class='pt-3-half' contenteditable='true'>PHP 2,000.00</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#expensetable").append(markup);
-    
-     });         
-    });    
 </script>
 
 <script>
@@ -3343,6 +3375,80 @@
 
 <script>
     $(document).ready(function(){
+
+        Date.prototype.toDateInputValue = (function() {
+            var local = new Date(this);
+            local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+            return local.toJSON().slice(0,10);
+        });
+
+        Date.prototype.addDays = function(days) {
+            this.setDate(this.getDate() + parseInt(days));
+            return this;
+        };
+
+        // ------------------------------------------------------------- INVOICE STARTS HERE --------------------------
+        $(document).on('change', '#term', function(event){
+            event.preventDefault();
+
+            var term = $('#term').val();
+
+            if(term=="Due on receipt" && $('#invoicedate').val()==""){
+                $('#invoicedate').val(new Date().toDateInputValue());
+                $('#invoiceduedate').val(new Date().toDateInputValue());
+            }else if(term=="Due on receipt"){
+                $('#invoiceduedate').val($('#invoicedate').val());
+            }else if(term=="Net 15"  && $('#invoicedate').val()==""){
+                $('#invoicedate').val(new Date().toDateInputValue());
+                $('#invoiceduedate').val(new Date(new Date().getTime()+(15*24*60*60*1000)).toDateInputValue());
+            }else if(term=="Net 15"){
+                var date= $('#invoicedate')[0].valueAsDate;
+                date.setDate(date.getDate() + 15);
+                $('#invoiceduedate')[0].valueAsDate = date;
+            }else if(term=="Net 30"  && $('#invoicedate').val()==""){
+                $('#invoicedate').val(new Date().toDateInputValue());
+                $('#invoiceduedate').val(new Date(new Date().getTime()+(30*24*60*60*1000)).toDateInputValue());
+            }else if(term=="Net 30"){
+                var date= $('#invoicedate')[0].valueAsDate;
+                date.setDate(date.getDate() + 30);
+                $('#invoiceduedate')[0].valueAsDate = date;
+            }else if(term=="Net 60"  && $('#invoicedate').val()==""){
+                $('#invoicedate').val(new Date().toDateInputValue());
+                $('#invoiceduedate').val(new Date(new Date().getTime()+(60*24*60*60*1000)).toDateInputValue());
+            }else if(term=="Net 60"){
+                var date= $('#invoicedate')[0].valueAsDate;
+                date.setDate(date.getDate() + 60);
+                $('#invoiceduedate')[0].valueAsDate = date;
+            }else{
+                
+            }
+        });
+
+        $(document).on('change', '#invoicedate', function(event){
+            event.preventDefault();
+
+            var term = $('#term').val();
+
+            if(term=="Due on receipt"){
+                $('#invoiceduedate').val($('#invoicedate').val());
+            }else if(term=="Net 15"){
+                var date= $('#invoicedate')[0].valueAsDate;
+                date.setDate(date.getDate() + 15);
+                $('#invoiceduedate')[0].valueAsDate = date;
+            }else if(term=="Net 30"){
+                var date= $('#invoicedate')[0].valueAsDate;
+                date.setDate(date.getDate() + 30);
+                $('#invoiceduedate')[0].valueAsDate = date;
+            }else if(term=="Net 60"){
+                var date= $('#invoicedate')[0].valueAsDate;
+                date.setDate(date.getDate() + 60);
+                $('#invoiceduedate')[0].valueAsDate = date;
+            }else{
+                $('#invoiceduedate').val($('#invoicedate').val());
+            }
+        });
+
+
         $(document).on('change', '.product_select', function(event){
             event.preventDefault();
             var id = $(this).val();
@@ -4222,7 +4328,7 @@
             update_total_credit_note();
         });
 
-        $(document).on('change', '#refundrcustomer', function(event){
+        $(document).on('change', '#creditncustomer', function(event){
             event.preventDefault();
             var id = $(this).val();
             if(id == ""){
@@ -4338,6 +4444,210 @@
                 }
                 total_credit_note += parseFloat(add_total);
                 $('#credit_notetotal').html(total_credit_note);
+            });
+        }
+
+        // ------------------------------------------------------------- EXPENSE TRANSACTION STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_expense', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_expense' + position).val('');
+                $('#select_product_rate_expense' + position).val('');
+                $('#total_amount_expense' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_expense' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_expense' + position).val(price);
+                        $('#total_amount_expense' + position).html(price * $('#product_qty_expense' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_expense();
+        });
+
+        $(document).on('change', '#expensepayee', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#expensebalance').html('PHP 0.00');
+                $('#big_expensebalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#expensebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_expensebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#expense_bill_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#expense_payment_method').val('{{$customer->payment_method}}');
+                        $('#expense_email').val('{{$customer->email}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_expense', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_expense'  + position).html($('#select_product_rate_expense'  + position).val() * $('#product_qty_expense' + position).val());
+           
+            update_total_expense();
+        });
+
+        $(document).on('change', '.expense_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_expense'  + position).html($('#select_product_rate_expense'  + position).val() * $('#product_qty_expense' + position).val());
+           
+            update_total_expense();
+        });
+
+
+        $("#add_lines_expense_item").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="expense_lines_item" id="expense_line_item'+$('#expense_item_table tr').length+'"><td class="pt-3-half" id="number_tag_expense_item" contenteditable="false">'+$('#expense_item_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="expense_data product_select_expense" id="select_product_name_expense'+$('#expense_item_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="expense_data product_description_expense" id="select_product_description_expense'+$('#expense_item_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="expense_data product_qty_expense" onclick="this.select();" id="product_qty_expense'+$('#expense_item_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="expense_data product_rate_expense" id="select_product_rate_expense'+$('#expense_item_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_expense" id="total_amount_expense'+$('#expense_item_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_expense'+$('#expense_item_table tr').length+'" class="fa fa-trash delete_product_expense"></a></td></tr>';
+            
+            $("#expense_item_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_expense_item").click(function(event){
+            event.preventDefault();
+            $('.expense_lines_item').remove();
+
+            update_total_expense();
+        }); 
+
+        $("#add_lines_expense_account").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="expense_lines_account" id="expense_line_account'+$('#expense_account_table tr').length+'"><td class="pt-3-half" id="number_tag_expense_account" contenteditable="false">'+$('#expense_account_table tr').length+'</td><td class="pt-3-half"><input style="border:0; width:100%;" list="account_expenses" class="expense_data account_select_expense" id="select_account_expense'+$('#expense_account_table tr').length+'"></td><td class="pt-3-half"><input class="expense_data description_select_expense" id="select_description_expense'+$('#expense_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="expense_data amount_select_expense" onclick="this.select();" id="select_expense_amount'+$('#expense_account_table tr').length+'" style="border:0; text-align:center;"></td><td class="pt-3-half"><a href="#" id="delete_account_expense'+$('#expense_account_table tr').length+'" class="fa fa-trash delete_account_expense"></a></td></tr>';
+            
+            $("#expense_account_table").append(markup);
+        }); 
+
+        $("#clear_lines_expense_account").click(function(event){
+            event.preventDefault();
+            $('.expense_lines_account').remove();
+
+            update_total_expense();
+        }); 
+
+        $(document).on('click', '.delete_product_expense', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#expense_line_item'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".expense_lines_item").each(function() {
+                $(this).attr("id","expense_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_expense").each(function() {
+                $(this).attr("id","delete_product_expense"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".expense_lines_item").find('#number_tag_expense_item').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_expense').each(function() {
+                $(this).attr("id","select_product_name_expense"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_expense').each(function() {
+                $(this).attr("id","select_product_description_expense"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_expense').each(function() {
+                $(this).attr("id","product_qty_expense"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_expense').each(function() {
+                $(this).attr("id","select_product_rate_expense"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_expense").each(function() {
+                $(this).attr("id","total_amount_expense"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_expense();
+        }); 
+
+        $(document).on('click', '.delete_account_expense', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#expense_line_account'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var account_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".expense_lines_account").each(function() {
+                $(this).attr("id","expense_line_account"+line_counter);
+                line_counter++;
+            });
+
+            $(".account_select_expense").each(function() {
+                $(this).attr("id","select_account_expense"+account_id_counter);
+                account_id_counter++;
+            });
+
+            $(".delete_account_expense").each(function() {
+                $(this).attr("id","delete_account_expense"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".expense_lines_account").find('#number_tag_expense_account').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.description_select_expense').each(function() {
+                $(this).attr("id","select_description_expense"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.amount_select_expense').each(function() {
+                $(this).attr("id","select_expense_amount"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_expense();
+        }); 
+
+        function update_total_expense(){
+            var total_expense = 0;
+            $('.product_total_expense').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_expense += parseFloat(add_total);
+                $('#expensetotal').html(total_expense);
             });
         }
 

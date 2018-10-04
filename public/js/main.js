@@ -396,4 +396,10 @@ jQuery(document).ready(function($) {
 		$('#creditnotemodal').modal('hide');
 	});
 
+	$("#add_expense_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#expensemodal').modal('hide');
+	});
+
 });

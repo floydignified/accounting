@@ -213,7 +213,7 @@ class CustomersController extends Controller
         $sales_transaction->st_email = $request->sr_email;
         $sales_transaction->st_send_later = $request->sr_send_later;
         $sales_transaction->st_bill_address = $request->sr_bill_address;
-        $sales_transaction->st_note = $request->sr_note;
+        $sales_transaction->st_note = $request->sr_message;
         $sales_transaction->st_memo = $request->sr_memo;
         $sales_transaction->st_i_attachment = $request->sr_attachment;
         $sales_transaction->st_balance = 0;
@@ -255,7 +255,7 @@ class CustomersController extends Controller
         $sales_transaction->st_email = $request->rr_email;
         $sales_transaction->st_send_later = $request->rr_send_later;
         $sales_transaction->st_bill_address = $request->rr_bill_address;
-        $sales_transaction->st_note = $request->rr_note;
+        $sales_transaction->st_note = $request->rr_message;
         $sales_transaction->st_memo = $request->rr_memo;
         $sales_transaction->st_i_attachment = $request->rr_attachment;
         $sales_transaction->st_balance = 0;
@@ -271,7 +271,7 @@ class CustomersController extends Controller
             $st_refund_receipt->st_r_desc = $request->input('select_product_description_refund_receipt'.$x);
             $st_refund_receipt->st_r_qty = $request->input('product_qty_refund_receipt'.$x);
             $st_refund_receipt->st_r_rate = $request->input('select_product_rate_refund_receipt'.$x);
-            $st_refund_receipt->st_r_total = $request->input('product_qty_refund_receipt'.$x) * $request->input('select_product_rate_refund_receipt'.$x);
+            $st_refund_receipt->st_r_total = -$request->input('product_qty_refund_receipt'.$x) * $request->input('select_product_rate_refund_receipt'.$x);
             $st_refund_receipt->st_p_method = $request->rr_payment_method;
             $st_refund_receipt->st_p_reference_no = null;
             $st_refund_receipt->st_p_deposit_to = $request->rr_refund_from;
@@ -382,7 +382,7 @@ class CustomersController extends Controller
         $sales_transaction->st_email = $request->cn_email;
         $sales_transaction->st_send_later = $request->cn_send_later;
         $sales_transaction->st_bill_address = $request->cn_bill_address;
-        $sales_transaction->st_note = $request->cn_note;
+        $sales_transaction->st_note = $request->cn_message;
         $sales_transaction->st_memo = $request->cn_memo;
         $sales_transaction->st_i_attachment = $request->cn_attachment;
         $sales_transaction->st_amount_paid = -$request->total_balance_credit_note;
@@ -390,6 +390,10 @@ class CustomersController extends Controller
 
         $customer = new Customers;
         $customer = Customers::find($request->cn_customer);
+
+        $value = [
+            'data' => [],
+        ];
 
         for($x=0;$x<$request->product_count_credit_note;$x++){
             $st_credit_note = new StCreditNote;
@@ -405,25 +409,33 @@ class CustomersController extends Controller
             $st_credit_note->st_p_amount = null;
             $st_credit_note->save();
 
+            $product = ProductsAndServices::find($request->input('select_product_name_credit_note'.$x));
+
+            $email_array = explode(',', $request->cn_email);
+
+            $value['data'][$x] = [
+                'name' => $customer->display_name,
+                'email' => $email_array,
+                'title' => 'CREDIT NOTE',
+                'note' => $request->cn_message,
+                'memo' => $request->cn_memo,
+                'product_name' => $product->product_name,
+                'product_description' => $request->input('select_product_description_credit_note'.$x),
+                'product_quantity' => $request->input('product_qty_credit_note'.$x),
+                'product_rate' => $request->input('select_product_rate_credit_note'.$x),
+                'product_total' => $request->input('product_qty_credit_note'.$x) * $request->input('select_product_rate_credit_note'.$x),
+                'credit_total' => $request->total_balance_credit_note,
+            ];
         }
 
-        $data = array(
-            'name' => $customer->display_name,
-            'email' => $request->cn_email,
-            'title' => 'CREDIT NOTE'
-        );
 
-        $pdf = PDF::loadView('credit_note_pdf', $data);
-
-        $attachment = $pdf->stream('credit_notice.pdf');
-
-        Mail::send(['text'=>'mail'], $data, function($message) use ($data)
+        Mail::send(['text'=>'mail'], $value, function($message) use ($value)
         {
-            $pdf = PDF::loadView('credit_note_pdf', $data);
+            $pdf = PDF::loadView('credit_note_pdf', $value);
             $attachment = $pdf->stream('credit_notice.pdf');
-            $message->attachData($attachment, 'invoice.pdf');
+            $message->attachData($attachment, 'credit_note.pdf');
 
-            $message->to($data['email'],'Hello Mr/Mrs '.$data['name'])->subject('This is a credit note for '.$data['name']);
+            $message->to($value['data'][0]['email'],'Hello Mr/Mrs '.$value['data'][0]['name'])->subject('This is a credit note for '.$value['data'][0]['name']);
             $message->from('floydignified@gmail.com','Floyd Matabilas');
         });
 

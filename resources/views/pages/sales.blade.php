@@ -68,12 +68,12 @@
                                 <p class="font14">0 OVERDUE</p>
                             </div>
                             <div class="col-md-2 bg-grey">
-                            <h3 class="invoice_total">PHP 2,000</h3>
+                            <h3 class="invoice_total">PHP 0</h3>
                                 <p class="font14 invoice_count">1 OPEN INVOICE</p>
                             </div>
                             <div class="col-md-4 bg-ltgreen">
-                                <h3>PHP0</h3>
-                                <p class="font14">0 PAID LAST 30 DAYS</p>
+                                <h3 class="paid_total">PHP 0</h3>
+                                <p class="font14 paid_count">0 PAID LAST 30 DAYS</p>
                             </div>
                         </div>
                         <div class="float-left">
@@ -572,8 +572,8 @@
                                 <p class="invoice_count">1 OPEN INVOICE</p>
                             </div>
                             <div class="col-md-4 bg-ltgreen">
-                                <h3>PHP0</h3>
-                                <p>0 PAID LAST 30 DAYS</p>
+                                <h3 class="paid_total">PHP0</h3>
+                                <p class="paid_count">0 PAID LAST 30 DAYS</p>
                             </div>
                         </div>
                         <div class="float-left">
@@ -1032,11 +1032,16 @@ $(document).ready(function(){
     var total_invoice_data = 0;
     var total_estimate_count = 0;
     var total_estimate_data = 0;
+    var total_paid_count = 0;
+    var total_paid_data = 0;
 
     @foreach($sales_transaction as $transaction)
         @if($transaction->st_type == "Invoice" && $transaction->st_status == "Open")
             total_invoice_count++;
             total_invoice_data += {{$transaction->invoice_info->sum('st_i_total')}};
+        @elseif($transaction->st_type == "Invoice" && $transaction->st_status == "Paid")
+            total_paid_count++;
+            total_paid_data += {{$transaction->invoice_info->sum('st_p_amount')}};
         @elseif($transaction->st_type == "Estimate" && $transaction->st_status == "Pending")
             total_estimate_count++;
             total_estimate_data += {{$transaction->estimate_info->sum('st_e_total')}};
@@ -1047,6 +1052,8 @@ $(document).ready(function(){
     $('.invoice_total').text("PHP " + total_invoice_data);
     $('.estimate_count').text(total_estimate_count + " OPEN ESTIMATE");
     $('.estimate_total').text("PHP " + total_estimate_data);
+    $('.paid_count').text(total_paid_count + " PAID LAST 30 DAYS");
+    $('.paid_total').text("PHP " + total_paid_data);
 
     
 
