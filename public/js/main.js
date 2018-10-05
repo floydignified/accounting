@@ -402,4 +402,16 @@ jQuery(document).ready(function($) {
 		$('#expensemodal').modal('hide');
 	});
 
+	$("#add_cheque_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#chequemodal').modal('hide');
+	});
+
+	$("#add_bill_form").submit(function(event) {
+		event.preventDefault();
+		
+		$('#billmodal').modal('hide');
+	});
+
 });

@@ -1076,11 +1076,11 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-3 p-0 pr-3">
-                        <select id="expensepayee" type="text" name="expense_customer" class="w-100" required>
-                            <option value=""></option>
-                            @foreach($customers as $customer)
-                            <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
-                            @endforeach
+                            <select id="expensepayee" type="text" name="expense_customer" class="w-100" required>
+                                <option value=""></option>
+                                @foreach($customers as $customer)
+                                <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-auto p-0 pr-2">
@@ -1201,6 +1201,10 @@
 </form>
 </div>
 <div class="modal fade p-0" id="chequemodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_cheque_form" onsubmit="addCheque()" autocomplete="off">
+{{ csrf_field() }}
+<input id="item_count_cheques" name="item_count_cheques" value="0" hidden>
+<input id="account_count_cheques" name="account_count_cheques" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -1213,13 +1217,18 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-3 p-0 pr-3">
-                            <input id="chequepayee" type="text" name="" placeholder="Choose a payee" class="w-100">
+                            <select id="chequepayee" type="text" name="cheque_customer" class="w-100" required>
+                                <option value=""></option>
+                                @foreach($customers as $customer)
+                                <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-auto p-0 pr-2">
                             <p class="font12 font-weight-bold float-right">Bank Account</p>
                         </div>
                         <div class="col-md-3 p-0">
-                            <input type="text" name="" placeholder="Cash and Cash Equivalents" class="w-100">
+                            <input type="text" list="payment_deposit" name="cheque_account" placeholder="Cash and Cash Equivalents" class="w-100" required>
                         </div>
                         <div class="col-auto p-0 pl-2">
                             <p class="font12 font-weight-bold float-right">Balance PHP 100</p>
@@ -1232,63 +1241,41 @@
                     <div class="col-md-12 p-0 mt-3 d-inline-flex">
                         <div class="col-md-3 p-0 pr-3">
                             <p>Mailing Address</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="cheque_billing_address" id="cheque_billing_address" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Payment Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="cheque_date" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Cheque No.</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="cheque_no" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1">
                         <h4>Account Details</h4>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="cheque_account_table">
                         <tr>
                             <th class="text-left">#</th>
-                            <th class="text-left">PRODUCT/SERVICE</th>
+                            <th class="text-left">ACCOUNT</th>
                             <th class="text-left">DESCRIPTION</th>
-                            <th class="text-center">QTY</th>
-                            <th class="text-left">RATE</th>
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14"  id="add_lines_cheque_account">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14"  id="add_lines_cheque_account">Clear All Lines</button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1 mt-4">
                         <h4>Item Details</h4>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="cheque_item_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -1298,32 +1285,12 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_cheque_item">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="cheque_lines_cheque_item">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
@@ -1336,7 +1303,7 @@
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="cheque_memo" required></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0">
                             <div class="d-inline-flex">
@@ -1345,7 +1312,7 @@
                             </div>
                             <div class="input-group mb-3 p-0">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <input type="file" class="custom-file-input" name="cheque_attachment" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                     <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                                 </div>
                             </div>
@@ -1355,12 +1322,17 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="chequeadd" class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="chequeadd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="billmodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
+<form action="#" class="form-horizontal " id="add_bill_form" onsubmit="addBill()" autocomplete="off">
+{{ csrf_field() }}
+<input id="item_count_bills" name="item_count_bills" value="0" hidden>
+<input id="account_count_bills" name="account_count_bills" value="0" hidden>
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
         <div class="modal-content" style="min-height: 100vh;">
             <div class="modal-header">
@@ -1373,7 +1345,12 @@
                 <div class="col-md-12 p-0 mb-4">
                     <div class="my-3 p-0">
                         <div class="col-md-3 p-0 pr-3">
-                            <input id="billpayee" type="text" name="" placeholder="Choose a customer" class="w-100">
+                            <select id="billpayee" type="text" name="bill_customer" class="w-100" required>
+                            <option value=""></option>
+                                @foreach($customers as $customer)
+                                <option value="{{$customer->customer_id}}">{{$customer->display_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-5 p-0">
                         </div>
@@ -1385,71 +1362,49 @@
                     <div class="col-md-12 p-0 mt-4 d-inline-flex">
                         <div class="col-md-4 p-0 pr-3">
                             <p>Billing Address</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="bill_billing_address" id="bill_billing_address" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Terms</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" list="terms_list" name="bill_terms" id="bill_terms" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Bill Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="bill_date" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Due Date</p>
-                            <input type="date" name="" class="w-100">
+                            <input type="date" name="bill_due_date" class="w-100" required>
                         </div>
                         <div class="col-md-2 p-0 pr-3">
                             <p>Bill No.</p>
-                            <input type="text" name="" class="w-100">
+                            <input type="text" name="bill_bill_no" class="w-100" required>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1 mt-3">
                         <h4>Account Details</h4>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="bill_account_table">
                         <tr>
                             <th class="text-left">#</th>
-                            <th class="text-left">PRODUCT/SERVICE</th>
+                            <th class="text-left">ACCOUNT</th>
                             <th class="text-left">DESCRIPTION</th>
-                            <th class="text-center">QTY</th>
-                            <th class="text-left">RATE</th>
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_bill_account">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_bill_account">Clear All Lines</button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 mb-1 mt-4">
                         <h4>Item Details</h4>
                     </div>
-                    <table class="table table-bordered table-responsive-md table-striped text-left font14">
+                    <table class="table table-bordered table-responsive-md table-striped text-left font14" id="bill_item_table">
                         <tr>
                             <th class="text-left">#</th>
                             <th class="text-left">PRODUCT/SERVICE</th>
@@ -1459,32 +1414,12 @@
                             <th class="text-left">AMOUNT</th>
                             <th class="text-center"></th>
                         </tr>
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">1</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">4</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 800.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
-                        <tr>
-                            <td class="pt-3-half" contenteditable="false">2</td>
-                            <td class="pt-3-half" contenteditable="true">Sales Product</td>
-                            <td class="pt-3-half" contenteditable="true">Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet. Lorem Ipsum Dolor Sit Amet.</td>
-                            <td class="pt-3-half text-center" contenteditable="true">3</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 200.00</td>
-                            <td class="pt-3-half" contenteditable="true">PHP 600.00</td>
-                            <td class="pt-3-half" contenteditable="false"><a href="" class="fa fa-trash"></a></td>
-                        </tr>
-                        <!-- This is our clonable table line -->
                     </table>
                     <div class="col-md-12 p-0">
                         <div class="float-left">
                             <div class="d-inline-flex">
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Add Lines</button>
-                                <button class="btn btn-outline-dark rounded mr-1 font14">Clear All Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="add_lines_bill_item">Add Lines</button>
+                                <button class="btn btn-outline-dark rounded mr-1 font14" id="clear_lines_bill_item">Clear All Lines</button>
                             </div>
                         </div>
                         <div class="float-right mr-5">
@@ -1497,7 +1432,7 @@
                     <div class="col-md-12 p-0 mt-4">
                         <div class="col-md-6 pl-0">
                             <p>Memo</p>
-                            <textarea rows="3" class="w-100"></textarea>
+                            <textarea rows="3" class="w-100" name="bill_memo" required></textarea>
                         </div>
                         <div class="col-md-6 m-0 pr-0">
                             <div class="d-inline-flex">
@@ -1506,7 +1441,7 @@
                             </div>
                             <div class="input-group mb-3 p-0">
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <input type="file" name="bill_attachment" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
                                     <label class="custom-file-label bg-transparent" for="inputGroupFile01">Choose file</label>
                                 </div>
                             </div>
@@ -1516,10 +1451,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                <button id="billadd" class="btn btn-success rounded" data-dismiss="modal">Save</button>
+                <button id="billadd" class="btn btn-success rounded" type="submit">Save</button>
             </div>
         </div>
     </div>
+</form>
 </div>
 <div class="modal fade p-0" id="purchaseordermodal" tabindex="-1" role="dialog" aria-hidden="true" style="">
     <div class="modal-dialog modal-full" role="document" style="min-width: 100%; margin: 0;">
@@ -3282,7 +3218,7 @@ function addExpense(){
         success: function (data) {
             swal("Done!", "Added expense", "success");
             $("#item_count_expenses").val('0');
-            $("#accountcount_expenses").val('0');
+            $("#account_count_expenses").val('0');
             checker = 0;
             counter = 0;
             $('#add_expense_form')[0].reset();
@@ -3297,44 +3233,149 @@ function addExpense(){
     });
 
 }
+
+function addCheque(){
+
+    //$('#total_balance').val($('#invoicetotal').text());
+
+    $(".cheque_lines_item").each(function() {
+        $("#item_count_cheques").val(parseInt($("#item_count_cheques").val())+1);
+    });
+
+    $(".cheque_lines_account").each(function() {
+        $("#account_count_cheques").val(parseInt($("#account_count_cheques").val())+1);
+    });
+
+    var counter = 0;
+    var checker = 0;
+
+    var counter1 = 0;
+    var checker1 = 0;
+
+    $(".cheque_lines_item").find('.cheque_data').each(function() {
+        var id = $(this).attr("id");
+        var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+        
+        $(this).attr("name", name+counter);
+        
+        checker++;
+        if(checker%4==0){
+            counter++;
+        }
+    });
+
+    $(".cheque_lines_account").find('.cheque_data').each(function() {
+        var id = $(this).attr("id");
+        var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+        
+        $(this).attr("name", name+counter1);
+        
+        checker1++;
+        if(checker1%3==0){
+            counter1++;
+        }
+    });
+
+
+    $.ajax({
+        method: "POST",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "{{ route('add_cheque') }}",
+        dataType: "text",
+        data: $('#add_cheque_form').serialize(),
+        success: function (data) {
+            swal("Done!", "Added cheque", "success");
+            $("#item_count_cheques").val('0');
+            $("#account_count_cheques").val('0');
+            checker = 0;
+            counter = 0;
+            $('#add_cheque_form')[0].reset();
+            $('.cheque_lines_item').remove();
+            $('.cheque_lines_account').remove();
+            sales_table.ajax.reload();
+            sales_table_invoice.ajax.reload();
+        },
+        error: function (data) {
+            swal("Error!", "Cheque failed", "error");
+        }
+    });
+
+}
+
+function addBill(){
+
+//$('#total_balance').val($('#invoicetotal').text());
+
+$(".bill_lines_item").each(function() {
+    $("#item_count_bills").val(parseInt($("#item_count_bills").val())+1);
+});
+
+$(".bill_lines_account").each(function() {
+    $("#account_count_bills").val(parseInt($("#account_count_bills").val())+1);
+});
+
+var counter = 0;
+var checker = 0;
+
+var counter1 = 0;
+var checker1 = 0;
+
+$(".bill_lines_item").find('.bill_data').each(function() {
+    var id = $(this).attr("id");
+    var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+    
+    $(this).attr("name", name+counter);
+    
+    checker++;
+    if(checker%4==0){
+        counter++;
+    }
+});
+
+$(".bill_lines_account").find('.bill_data').each(function() {
+    var id = $(this).attr("id");
+    var name = id.replace(id.match(/(\d+)/g)[0], '').trim();  
+    
+    $(this).attr("name", name+counter1);
+    
+    checker1++;
+    if(checker1%3==0){
+        counter1++;
+    }
+});
+
+
+$.ajax({
+    method: "POST",
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    url: "{{ route('add_bill') }}",
+    dataType: "text",
+    data: $('#add_bill_form').serialize(),
+    success: function (data) {
+        swal("Done!", "Added bill", "success");
+        $("#item_count_bills").val('0');
+        $("#account_count_bills").val('0');
+        checker = 0;
+        counter = 0;
+        $('#add_bill_form')[0].reset();
+        $('.bill_lines_item').remove();
+        $('.bill_lines_account').remove();
+        sales_table.ajax.reload();
+        sales_table_invoice.ajax.reload();
+    },
+    error: function (data) {
+        swal("Error!", "Bill failed", "error");
+    }
+});
+
+}
     
 </script>
 
-<script>
-    $(document).ready(function(){
-    
-        $("#billadd").click(function(){
-            
-            var billpayee = $("#billpayee").val();
-   
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>7/26/2018</td><td class='pt-3-half' contenteditable='true'>Bill</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+billpayee+"</td><td class='pt-3-half' contenteditable='true'><select><option>Bad Debts</option></select></td><td class='pt-3-half' contenteditable='true'>PHP 2,000.00</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#expensetable").append(markup);
-    
-     });         
-    });    
-</script>
-
-<script>
-    $(document).ready(function(){
-    
-        $("#chequeadd").click(function(){
-            
-            var chequepayee = $("#chequepayee").val();
-   
-    
-            // var markup = "<tr><td><input type='checkbox' name='record'></td><td>" + name + "</td><td>" + subject + "</td></tr>";
-    
-            var markup = "<tr><td class='pt-3-half' contenteditable='true'><input type='checkbox' name=''></td><td class='pt-3-half' contenteditable='true'>7/26/2018</td><td class='pt-3-half' contenteditable='true'>Cheque</td><td class='pt-3-half' contenteditable='true'>1001</td><td class='pt-3-half' contenteditable='true'>"+chequepayee+"</td><td class='pt-3-half' contenteditable='true'><select><option>Bad Debts</option></select></td><td class='pt-3-half' contenteditable='true'>PHP 2,000.00</td><td><span class='table-add mb-3 mr-2'><a href='#!' class='text-info'><i aria-hidden='true'>Receive Payment</i></a></span></td></tr>";
-    
-        $("#expensetable").append(markup);
-    
-     });         
-    });    
-</script>
 
 <script>
     $(document).ready(function(){
@@ -4650,6 +4691,418 @@ function addExpense(){
                 $('#expensetotal').html(total_expense);
             });
         }
+
+
+        // ------------------------------------------------------------- CHEQUE TRANSACTION STARTS HERE --------------------------
+        
+        $(document).on('change', '.product_select_cheque', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_cheque' + position).val('');
+                $('#select_product_rate_cheque' + position).val('');
+                $('#total_amount_cheque' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_cheque' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_cheque' + position).val(price);
+                        $('#total_amount_cheque' + position).html(price * $('#product_qty_cheque' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_cheque();
+        });
+
+        $(document).on('change', '#chequepayee', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#chequebalance').html('PHP 0.00');
+                $('#big_chequebalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#chequebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_chequebalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#cheque_billing_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#cheque_payment_method').val('{{$customer->payment_method}}');
+                        $('#cheque_email').val('{{$customer->email}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_cheque', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_cheque'  + position).html($('#select_product_rate_cheque'  + position).val() * $('#product_qty_cheque' + position).val());
+           
+            update_total_cheque();
+        });
+
+        $(document).on('change', '.cheque_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_cheque'  + position).html($('#select_product_rate_cheque'  + position).val() * $('#product_qty_cheque' + position).val());
+           
+            update_total_cheque();
+        });
+
+
+        $("#add_lines_cheque_item").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="cheque_lines_item" id="cheque_line_item'+$('#cheque_item_table tr').length+'"><td class="pt-3-half" id="number_tag_cheque_item" contenteditable="false">'+$('#cheque_item_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="cheque_data product_select_cheque" id="select_product_name_cheque'+$('#cheque_item_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="cheque_data product_description_cheque" id="select_product_description_cheque'+$('#cheque_item_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="cheque_data product_qty_cheque" onclick="this.select();" id="product_qty_cheque'+$('#cheque_item_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="cheque_data product_rate_cheque" id="select_product_rate_cheque'+$('#cheque_item_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_cheque" id="total_amount_cheque'+$('#cheque_item_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_cheque'+$('#cheque_item_table tr').length+'" class="fa fa-trash delete_product_cheque"></a></td></tr>';
+            
+            $("#cheque_item_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_cheque_item").click(function(event){
+            event.preventDefault();
+            $('.cheque_lines_item').remove();
+
+            update_total_cheque();
+        }); 
+
+        $("#add_lines_cheque_account").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="cheque_lines_account" id="cheque_line_account'+$('#cheque_account_table tr').length+'"><td class="pt-3-half" id="number_tag_cheque_account" contenteditable="false">'+$('#cheque_account_table tr').length+'</td><td class="pt-3-half"><input style="border:0; width:100%;" list="account_expenses" class="cheque_data account_select_cheque" id="select_account_cheque'+$('#cheque_account_table tr').length+'"></td><td class="pt-3-half"><input class="cheque_data description_select_cheque" id="select_description_cheque'+$('#cheque_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="cheque_data amount_select_cheque" onclick="this.select();" id="select_cheque_amount'+$('#cheque_account_table tr').length+'" style="border:0; text-align:center;"></td><td class="pt-3-half"><a href="#" id="delete_account_cheque'+$('#cheque_account_table tr').length+'" class="fa fa-trash delete_account_cheque"></a></td></tr>';
+            
+            $("#cheque_account_table").append(markup);
+        }); 
+
+        $("#clear_lines_cheque_account").click(function(event){
+            event.preventDefault();
+            $('.cheque_lines_account').remove();
+
+            update_total_cheque();
+        }); 
+
+        $(document).on('click', '.delete_product_cheque', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#cheque_line_item'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".cheque_lines_item").each(function() {
+                $(this).attr("id","cheque_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_cheque").each(function() {
+                $(this).attr("id","delete_product_cheque"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".cheque_lines_item").find('#number_tag_cheque_item').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_cheque').each(function() {
+                $(this).attr("id","select_product_name_cheque"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_cheque').each(function() {
+                $(this).attr("id","select_product_description_cheque"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_cheque').each(function() {
+                $(this).attr("id","product_qty_cheque"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_cheque').each(function() {
+                $(this).attr("id","select_product_rate_cheque"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_cheque").each(function() {
+                $(this).attr("id","total_amount_cheque"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_cheque();
+        }); 
+
+        $(document).on('click', '.delete_account_cheque', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#cheque_line_account'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var account_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".cheque_lines_account").each(function() {
+                $(this).attr("id","cheque_line_account"+line_counter);
+                line_counter++;
+            });
+
+            $(".account_select_cheque").each(function() {
+                $(this).attr("id","select_account_cheque"+account_id_counter);
+                account_id_counter++;
+            });
+
+            $(".delete_account_cheque").each(function() {
+                $(this).attr("id","delete_account_cheque"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".cheque_lines_account").find('#number_tag_cheque_account').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.description_select_cheque').each(function() {
+                $(this).attr("id","select_description_cheque"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.amount_select_cheque').each(function() {
+                $(this).attr("id","select_cheque_amount"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_cheque();
+        }); 
+
+        function update_total_cheque(){
+            var total_cheque = 0;
+            $('.product_total_cheque').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_cheque += parseFloat(add_total);
+                $('#chequetotal').html(total_cheque);
+            });
+        }
+
+
+         // ------------------------------------------------------------- BILL TRANSACTION STARTS HERE --------------------------
+        
+         $(document).on('change', '.product_select_bill', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            if(id == ""){
+                $('#select_product_description_bill' + position).val('');
+                $('#select_product_rate_bill' + position).val('');
+                $('#total_amount_bill' + position).html('');
+            }else{
+            @foreach($products_and_services as $product)
+                    if(id == {{$product->product_id}}){
+                        var price = '{{number_format($product->product_sales_price,2)}}';
+                        $('#select_product_description_bill' + position).val('{{$product->product_sales_description}}');
+                        $('#select_product_rate_bill' + position).val(price);
+                        $('#total_amount_bill' + position).html(price * $('#product_qty_bill' + position).val());
+                    }
+            @endforeach
+            }
+
+            update_total_bill();
+        });
+
+        $(document).on('change', '#billpayee', function(event){
+            event.preventDefault();
+            var id = $(this).val();
+            if(id == ""){
+                $('#billbalance').html('PHP 0.00');
+                $('#big_billbalance').html('PHP 0.00');
+            }else{
+            @foreach($customers as $customer)
+                    if(id == {{$customer->customer_id}}){
+                        $('#billbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#big_billbalance').html('PHP {{number_format($customer->opening_balance,2)}}');
+                        $('#bill_billing_address').val('{{$customer->street." ".$customer->city." ".$customer->state." ".$customer->postal_code." ".$customer->country}}');
+                        $('#bill_payment_method').val('{{$customer->payment_method}}');
+                        $('#bill_email').val('{{$customer->email}}');
+                        $('#bill_terms').val('{{$customer->terms}}');
+                    }
+            @endforeach
+            }
+        });
+
+        $(document).on('change', '.product_qty_bill', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_bill'  + position).html($('#select_product_rate_bill'  + position).val() * $('#product_qty_bill' + position).val());
+           
+            update_total_bill();
+        });
+
+        $(document).on('change', '.bill_data', function(){
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#total_amount_bill'  + position).html($('#select_product_rate_bill'  + position).val() * $('#product_qty_bill' + position).val());
+           
+            update_total_bill();
+        });
+
+
+        $("#add_lines_bill_item").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="bill_lines_item" id="bill_line_item'+$('#bill_item_table tr').length+'"><td class="pt-3-half" id="number_tag_bill_item" contenteditable="false">'+$('#bill_item_table tr').length+'</td><td class="pt-3-half"><select style="border:0; width:100%;" class="bill_data product_select_bill" id="select_product_name_bill'+$('#bill_item_table tr').length+'"><option value=""></option>@foreach($products_and_services as $product)<option value="{{$product->product_id}}">{{$product->product_name}}</option>@endforeach</select></td><td class="pt-3-half"><input class="bill_data product_description_bill" id="select_product_description_bill'+$('#bill_item_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="bill_data product_qty_bill" onclick="this.select();" id="product_qty_bill'+$('#bill_item_table tr').length+'" style="border:0; text-align:center;" value="1"></td><td class="pt-3-half"><input class="bill_data product_rate_bill" id="select_product_rate_bill'+$('#bill_item_table tr').length+'" style="border:0;"></td><td class="pt-3-half product_total_bill" id="total_amount_bill'+$('#bill_item_table tr').length+'"></td><td class="pt-3-half"><a href="#" id="delete_product_bill'+$('#bill_item_table tr').length+'" class="fa fa-trash delete_product_bill"></a></td></tr>';
+            
+            $("#bill_item_table").append(markup);
+
+
+        }); 
+
+        $("#clear_lines_bill_item").click(function(event){
+            event.preventDefault();
+            $('.bill_lines_item').remove();
+
+            update_total_bill();
+        }); 
+
+        $("#add_lines_bill_account").click(function(event){
+            event.preventDefault();
+            var markup = '<tr class="bill_lines_account" id="bill_line_account'+$('#bill_account_table tr').length+'"><td class="pt-3-half" id="number_tag_bill_account" contenteditable="false">'+$('#bill_account_table tr').length+'</td><td class="pt-3-half"><input style="border:0; width:100%;" list="account_expenses" class="bill_data account_select_bill" id="select_account_bill'+$('#bill_account_table tr').length+'"></td><td class="pt-3-half"><input class="bill_data description_select_bill" id="select_description_bill'+$('#bill_account_table tr').length+'" style="border:0;"></td><td class="pt-3-half"><input type="number" class="bill_data amount_select_bill" onclick="this.select();" id="select_bill_amount'+$('#bill_account_table tr').length+'" style="border:0; text-align:center;"></td><td class="pt-3-half"><a href="#" id="delete_account_bill'+$('#bill_account_table tr').length+'" class="fa fa-trash delete_account_bill"></a></td></tr>';
+            
+            $("#bill_account_table").append(markup);
+        }); 
+
+        $("#clear_lines_bill_account").click(function(event){
+            event.preventDefault();
+            $('.bill_lines_account').remove();
+
+            update_total_bill();
+        }); 
+
+        $(document).on('click', '.delete_product_bill', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#bill_line_item'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var product_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".bill_lines_item").each(function() {
+                $(this).attr("id","bill_line"+line_counter);
+                line_counter++;
+            });
+
+            $(".delete_product_bill").each(function() {
+                $(this).attr("id","delete_product_bill"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".bill_lines_item").find('#number_tag_bill_item').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.product_select_bill').each(function() {
+                $(this).attr("id","select_product_name_bill"+product_id_counter);
+                product_id_counter++;
+            });
+
+            $('.product_description_bill').each(function() {
+                $(this).attr("id","select_product_description_bill"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.product_qty_bill').each(function() {
+                $(this).attr("id","product_qty_bill"+qty_id_counter);
+                qty_id_counter++;
+            });
+
+            $('.product_rate_bill').each(function() {
+                $(this).attr("id","select_product_rate_bill"+rate_id_counter);
+                rate_id_counter++;
+            });
+
+            $(".product_total_bill").each(function() {
+                $(this).attr("id","total_amount_bill"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_bill();
+        }); 
+
+        $(document).on('click', '.delete_account_bill', function(event){
+            event.preventDefault();
+            var position = $(this).attr('id').replace(/[^0-9\.]/g, '');
+            $('#bill_line_account'+position).remove();
+            
+            var line_counter = 1;
+            var delete_counter = 1;
+            var tag_counter = 1;
+            var account_id_counter = 1;
+            var description_id_counter = 1;
+            var qty_id_counter = 1;
+            var rate_id_counter = 1;
+            var total_id_counter = 1;
+
+            $(".bill_lines_account").each(function() {
+                $(this).attr("id","bill_line_account"+line_counter);
+                line_counter++;
+            });
+
+            $(".account_select_bill").each(function() {
+                $(this).attr("id","select_account_bill"+account_id_counter);
+                account_id_counter++;
+            });
+
+            $(".delete_account_bill").each(function() {
+                $(this).attr("id","delete_account_bill"+delete_counter);
+                delete_counter++;
+            });
+
+            $(".bill_lines_account").find('#number_tag_bill_account').each(function() {
+                $(this).html(tag_counter);
+                tag_counter++;
+            });
+
+            $('.description_select_bill').each(function() {
+                $(this).attr("id","select_description_bill"+description_id_counter);
+                description_id_counter++;
+            });
+
+            $('.amount_select_bill').each(function() {
+                $(this).attr("id","select_bill_amount"+total_id_counter);
+                total_id_counter++;
+            });
+
+            update_total_bill();
+        }); 
+
+        function update_total_bill(){
+            var total_bill = 0;
+            $('.product_total_bill').each(function() {
+                var add_total = $(this).html();
+                if(add_total==""){
+                    add_total=0;
+                }
+                total_bill += parseFloat(add_total);
+                $('#billtotal').html(total_bill);
+            });
+        }
+
 
     });    
 

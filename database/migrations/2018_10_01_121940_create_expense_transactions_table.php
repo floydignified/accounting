@@ -34,6 +34,7 @@ class CreateExpenseTransactionsTable extends Migration
             $table->string('et_shipping_address')->nullable();
             $table->string('et_shipping_to')->nullable();
             $table->string('et_shipping_via')->nullable();
+            $table->string('et_type')->nullable();
             $table->timestamps();
         });
     }

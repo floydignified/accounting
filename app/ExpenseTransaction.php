@@ -23,6 +23,7 @@ class ExpenseTransaction extends Model
         'et_shipping_address',
         'et_shipping_to',
         'et_shipping_via',
+        'et_type',
     );
 
     public $timestamps = true;
